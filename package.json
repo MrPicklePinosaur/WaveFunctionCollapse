@@ -1,0 +1,11 @@
+{
+  "name": "wfc",
+  "version": "1.0.0",
+  "description": "simple webapp to explore the wave function collapse algorithm",
+  "main": "pic.js",
+  "scripts": {
+    "test": "start"
+  },
+  "author": "pinosaur",
+  "license": "MIT"
+}
