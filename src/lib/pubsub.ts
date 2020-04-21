@@ -2,17 +2,21 @@
 
 export type CallbackFunction = (data: any) => any;
 
+export enum PubSubEvents {
+    STATECHANGE
+}
+
 export default class PubSub {
-    events: {[event: string]: CallbackFunction[]};
-    
+    events: Record<PubSubEvents,CallbackFunction[]>; //dict
+
     constructor() {
-        this.events = {};
+        //this.events = {};
     }
 
-    subscribe(event: string, callback: CallbackFunction): number {
+    subscribe(event: PubSubEvents, callback: CallbackFunction): number { //the listener requests a subscription to a certain event
 
         let ctx = this;
-        if (!ctx.events.hasOwnProperty(event)) { //if event not yet created
+        if (!ctx.events.hasOwnProperty(event)) { //if event not yet created, create it
             ctx.events[event] = [];
         }
 
@@ -21,7 +25,7 @@ export default class PubSub {
     }
 
     
-    publish(event: string, data: any = {}) {
+    publish(event: PubSubEvents, data: any = {}) { //trigger an event, and notify all subscribers
 
         let ctx = this;
         if (!ctx.events.hasOwnProperty(event)) { //if event does not exist, do nothing
