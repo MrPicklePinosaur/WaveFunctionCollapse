@@ -1,4 +1,5 @@
-import PubSub, { PubSubEvents } from '../lib/pubsub.js';
+import PubSub, {PubSubEvents} from '../lib/pubsub.js';
+
 
 export enum StoreStatus {
     RESTING,
@@ -14,22 +15,24 @@ export default class Store {
     status: StoreStatus;
     events: PubSub;
 
-    constructor(params: any) {
+    constructor(params: {actions?, mutations?, state?}) {
         let ctx = this;
 
-        ctx.actions = {};
-        ctx.mutations = {};
+        ctx.actions = params.actions || {};
+        ctx.mutations = params.mutations || {};
         //ctx.state = {};
         ctx.status = StoreStatus.RESTING; //what the store is currently doing
         ctx.events = new PubSub();
 
         //apply special modifiers based on params passed in
+        /*
         if (params.hasOwnProperty('actions')) {
             ctx.actions = params.actions;
         }
         if (params.hasOwnProperty('mutations')) {
             ctx.mutations = params.mutations;
         }
+        */
 
         ctx.state = new Proxy((params.state || {}), { //if params has a state setting, take that as the target
             set: function(state: any, key: any, value: any): boolean {
@@ -66,7 +69,7 @@ export default class Store {
         return true;
     }
 
-    commit(mutationKey, payload): boolean { //modifies the state
+    commit(mutationKey, payload): boolean { //modifies the state based on payload
 
         let ctx = this;
 

@@ -1,7 +1,6 @@
 //tutorial from https://css-tricks.com/build-a-state-management-system-with-vanilla-javascript/
 
 export type CallbackFunction = (data: any) => any;
-
 export enum PubSubEvents {
     STATECHANGE
 }
