@@ -10,18 +10,20 @@ var StoreStatus;
 var Store = /** @class */ (function () {
     function Store(params) {
         var ctx = this;
-        ctx.actions = {};
-        ctx.mutations = {};
-        ctx.state = {};
+        ctx.actions = params.actions || {};
+        ctx.mutations = params.mutations || {};
+        //ctx.state = {};
         ctx.status = StoreStatus.RESTING; //what the store is currently doing
         ctx.events = new pubsub_js_1["default"]();
         //apply special modifiers based on params passed in
+        /*
         if (params.hasOwnProperty('actions')) {
             ctx.actions = params.actions;
         }
         if (params.hasOwnProperty('mutations')) {
             ctx.mutations = params.mutations;
         }
+        */
         ctx.state = new Proxy((params.state || {}), {
             set: function (state, key, value) {
                 state[key] = value;

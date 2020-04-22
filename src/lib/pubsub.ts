@@ -5,11 +5,13 @@ export enum PubSubEvents {
 
 export default class PubSub {
 
-    events: Record<PubSubEvents,Array<(state: Object) => void>>;
+    //events: Record<PubSubEvents,Array<{(state: Object): void}>>;
     //events: Record<PubSubEvents,{(state: Object): void;}[]>;
+    events: any; //make this better later
 
     constructor() {
-        //this.events[PubSubEvents.STATECHANGE] = [];
+
+        this.events = {};
     }
 
     subscribe(event: PubSubEvents, callback: {(state: Object): void}) { //subscibe callback function to event
@@ -22,7 +24,7 @@ export default class PubSub {
     }
 
 
-    publish(event: PubSubEvents, state: Object) { //trigger event
+    publish(event: PubSubEvents, state: Object) { //trigger event, each listener responds
         let self = this;
 
         self.events[event].forEach(function(callback) {

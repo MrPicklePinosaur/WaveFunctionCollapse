@@ -1,16 +1,18 @@
-import PubSub, {PubSubEvents} from "../lib/pubsub";
-
+import PubSub, {PubSubEvents} from "../lib/pubsub.js";
+import actions from "./actions.js";
 
 export default class Store {
 
     pubsub: PubSub;
-    state: Object;
+    actions: any;
+    state: any;
 
-    constructor() {
+    constructor(params: any = {}) {
         let self = this;
 
         self.pubsub = new PubSub();
-        self.state = new Proxy({}, {
+        self.actions = (params.actions || {});
+        self.state = new Proxy((params.state || {}), {
             set: function(target, key, value): boolean {
                 
                 target[key] = value;
@@ -21,5 +23,18 @@ export default class Store {
                 return true;
             }
         });
+    }
+
+    dispatch(actionName: string, payload: any) { //modifies the state of the store
+
+        let self = this;
+
+        if (!(actionName in self.actions)) { 
+            console.warn(`${actionName} is not a defined action`);
+            return;
+        }
+
+        let newState = self.actions[actionName](self.state,payload);
+        self.state = Object.assign(self.state, newState);
     }
 }
