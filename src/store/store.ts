@@ -1,5 +1,5 @@
 import PubSub, {PubSubEvents} from "../lib/pubsub.js";
-import actions from "./actions.js";
+import {actions} from "./actions.js";
 
 export default class Store {
 

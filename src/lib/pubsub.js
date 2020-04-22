@@ -6,16 +6,7 @@ var PubSubEvents;
 })(PubSubEvents = exports.PubSubEvents || (exports.PubSubEvents = {}));
 var PubSub = /** @class */ (function () {
     function PubSub() {
-        //let self = this;
         this.events = {};
-        /*
-        //this.events[PubSubEvents.STATECHANGE] = [];
-        for (let item in PubSubEvents) {
-            if (isNaN(Number(item))) {
-                self.events[item] = [];
-            }
-        }
-        */
     }
     PubSub.prototype.subscribe = function (event, callback) {
         var self = this;

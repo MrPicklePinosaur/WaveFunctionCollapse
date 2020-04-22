@@ -8,6 +8,8 @@ export default class ColorSelector extends Component {
             store: store,
             element: document.getElementById('color-button')
         });
+
+        this.element.
         
         
     }

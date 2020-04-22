@@ -1,7 +1,7 @@
 import Store from "./store.js";
 
-export default {
+export var actions = {
     "setColor": function(state: any, payload: any) {
-        state['color'] = payload;
+        state.color = payload;
     }
 }
