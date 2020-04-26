@@ -33,13 +33,24 @@ var Sprite = /** @class */ (function () {
         self.pixels[ind] = color;
     };
     //width and height must be positive
-    Sprite.prototype.slice = function (x, y, width, height) {
+    Sprite.prototype.slice = function (x, y, sliceWidth, sliceHeight) {
         var self = this;
+        //check to see if slice is even valid
+        var offsetX = 0;
+        var offsetY = 0;
+        if (!this.wrapSprite) {
+            offsetX = sliceWidth - 1;
+            offsetY = sliceHeight - 1;
+        }
+        if (x < 0 || x > this.width - offsetX || y < 0 || y > this.height - offsetY) {
+            console.warn("INVALID SLICE PARAMETERS " + x + "," + y + "," + sliceWidth + "," + sliceHeight);
+            return null;
+        }
         var sliced = new Array();
         var y_ind = y;
-        for (var j = 0; j < height; j++) {
+        for (var j = 0; j < sliceHeight; j++) {
             var x_ind = x;
-            for (var i = 0; i < width; i++) {
+            for (var i = 0; i < sliceWidth; i++) {
                 var ind = x_ind + y_ind * self.width;
                 sliced.push(self.pixels[ind]);
                 x_ind += 1;
@@ -52,15 +63,15 @@ var Sprite = /** @class */ (function () {
                 y_ind -= self.height;
             } //wrap back around to top
         }
-        return new Sprite(width, height, sliced);
+        return sliced;
     };
     Sprite.compare = function (a, b) {
         //if the sprites arent even the same size
-        if (a.pixels.length != b.pixels.length) {
+        if (a.length != b.length) {
             return false;
         }
-        for (var i = 0; i < a.pixels.length; i++) {
-            if (a.pixels[i] != b.pixels[i]) {
+        for (var i = 0; i < a.length; i++) {
+            if (a[i] != b[i]) {
                 return false;
             }
         }

@@ -48,12 +48,12 @@ export default class Sprite {
         //check to see if slice is even valid
         var offsetX = 0;
         var offsetY = 0;
-        if (this.wrapSprite) {
+        if (!this.wrapSprite) {
             offsetX = sliceWidth-1;
             offsetY = sliceHeight-1;
         }
-        if (x < 0 || x > this.width-sliceWidth || y < 0 || y > this.height-sliceHeight) {
-            console.warn(`INVALID SLICE PARAMETERS ${{x,y,sliceWidth,sliceHeight}}`);
+        if (x < 0 || x > this.width-offsetX || y < 0 || y > this.height-offsetY) {
+            console.warn(`INVALID SLICE PARAMETERS ${x},${y},${sliceWidth},${sliceHeight}`);
             return null;
         }
 

@@ -7,8 +7,8 @@ export default class WFC {
     sliceHeight: number;
 
     indexed_sprite: Array<number>;
-    tile_table: Array<string[]>; //of the form tile_index: pixel_data
-    adjacency: Array<Record<number,number>>; //of the form tile_index: [adjacent_tileIndex: frequency_hits]
+    tile_table: Array<string[]>; //of the form tile_index: pixel_data, also, we're using the index in the array as the id/index
+    adjacency: Array<Record<number,number>>; //of the form tile_index: {adjacent_tileIndex: frequency_hits}
 
     constructor(sprite: Sprite, sliceWidth: number, sliceHeight: number) {
         this.sprite = sprite;
@@ -25,11 +25,12 @@ export default class WFC {
     imageProcessor(): void { 
 
         //handle wrapping sprites
+        //default to wrapping on
         var outputWidth = this.sprite.width;
         var outputHeight = this.sprite.height;
         if(!this.sprite.wrapSprite) { //if wrapping is off
-            outputWidth -= this.sliceWidth;
-            outputHeight -= this.sliceHeight;
+            outputWidth -= (this.sliceWidth-1);
+            outputHeight -= (this.sliceHeight-1);
         }
 
         this.indexed_sprite = new Array<number>(outputWidth*outputHeight);
@@ -55,6 +56,15 @@ export default class WFC {
 
                     //add frequency hint to curPixel's dict of frequncy hints
 
+                    //check if the newPixel has already been hit before
+                    if (this.adjacency[curPixelIndex][newPixelIndex] == null) {
+                        //if not, set the hit count to 1
+                        this.adjacency[curPixelIndex][newPixelIndex] = 1;
+                    } else {
+                        //otherwise increment
+                        this.adjacency[curPixelIndex][newPixelIndex] += 1;
+                    }
+
                 }
  
 
@@ -76,7 +86,7 @@ export default class WFC {
         //if the pixel pattern was not found, add it
         if (index == -1) {
             this.tile_table.push(pixels);
-            this.adjacency.push({});
+            this.adjacency.push({}); //don't forget to also add a new entry in adjacency hints
             index = this.tile_table.length-1; //set the current index as the last position
         }
 
