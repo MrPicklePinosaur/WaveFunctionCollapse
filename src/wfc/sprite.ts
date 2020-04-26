@@ -42,7 +42,7 @@ export default class Sprite {
     }
 
     //width and height must be positive
-    slice(x: number, y: number, width: number, height: number): Sprite {
+    slice(x: number, y: number, width: number, height: number): string[] {
         var self = this;
         var sliced = new Array();
 
@@ -64,16 +64,17 @@ export default class Sprite {
             if (y_ind > self.height-1) { y_ind -= self.height; } //wrap back around to top
         }
 
-        return new Sprite(width,height,sliced);
+        return sliced;
     }
 
-    static compare(a: Sprite, b: Sprite): boolean { //compares the pixel data
+    static compare(a: string[], b: string[]): boolean { //compares the pixel data
         //if the sprites arent even the same size
-        if (a.pixels.length != b.pixels.length) { return false; }
+        if (a.length != b.length) { return false; }
 
-        for (var i = 0; i < a.pixels.length; i++) {
-            if (a.pixels[i] != b.pixels[i]) { return false; }
+        for (var i = 0; i < a.length; i++) {
+            if (a[i] != b[i]) { return false; }
         }
         return true;
     }
+
 }
