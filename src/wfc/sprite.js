@@ -4,10 +4,10 @@ var Sprite = /** @class */ (function () {
     function Sprite(width, height, pixels, wrapSprite) {
         this.width = width;
         this.height = height;
-        this.pixels = pixels || this.emptyPixels(width, height);
+        this.pixels = pixels || Sprite.emptyPixels(width, height);
         this.wrapSprite = wrapSprite || false;
     }
-    Sprite.prototype.emptyPixels = function (width, height) {
+    Sprite.emptyPixels = function (width, height) {
         var arr = new Array(width * height);
         for (var i = 0; i < width * height; i++) {
             arr[i] = '#000000';
@@ -52,15 +52,19 @@ var Sprite = /** @class */ (function () {
                 y_ind -= self.height;
             } //wrap back around to top
         }
-        /*
-        for (var j = 0; j < height; j++) {
-            for (var i = 0; i < width; i++) {
-                var ind = (x+i)+(y+j)*self.width;
-                sliced.push(self.pixels[ind]);
+        return new Sprite(width, height, sliced);
+    };
+    Sprite.compare = function (a, b) {
+        //if the sprites arent even the same size
+        if (a.pixels.length != b.pixels.length) {
+            return false;
+        }
+        for (var i = 0; i < a.pixels.length; i++) {
+            if (a.pixels[i] != b.pixels[i]) {
+                return false;
             }
         }
-        */
-        return new Sprite(width, height, sliced);
+        return true;
     };
     return Sprite;
 }());

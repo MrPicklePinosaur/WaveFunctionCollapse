@@ -3,8 +3,12 @@ exports.__esModule = true;
 var WFC = /** @class */ (function () {
     function WFC(sprite) {
         this.sprite = sprite;
+        this.tile_table = [];
+        this.adjacency = [];
     }
+    //gets all enumerations of the main sprite and indexes each subsprite as well as generating adjacncy rules for each subsprite
     WFC.prototype.imageProcessor = function (sliceWidth, sliceHeight) {
+        //handle wrapping sprites
         var offsetX = 0;
         var offsetY = 0;
         if (!this.sprite.wrapSprite) {

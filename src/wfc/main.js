@@ -2,8 +2,6 @@
 exports.__esModule = true;
 var sprite_js_1 = require("./sprite.js");
 var wfc_js_1 = require("./wfc.js");
-// <reference path="./sprite.js" />
-// <reference path="./wfc.js" />
 function drawSprite(sprite, canvas, scale) {
     canvas.width = sprite.width * scale;
     canvas.height = sprite.height * scale;
@@ -32,6 +30,7 @@ var wfc_form = document.querySelector("form"); //only works cuz its the only for
 //preliminary stuff
 wfc_form.addEventListener('submit', function (evt) {
     evt.preventDefault();
+    //get some form data
     var data = new FormData(wfc_form);
     var sliceWidth = +data.get('slice-width'); //convert to number
     var sliceHeight = +data.get('slice-height');

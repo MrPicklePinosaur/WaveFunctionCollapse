@@ -2,9 +2,6 @@
 import Sprite from "./sprite.js";
 import WFC from "./wfc.js";
 
-// <reference path="./sprite.js" />
-// <reference path="./wfc.js" />
-
 function drawSprite(sprite: Sprite, canvas: any, scale: number) {
     canvas.width = sprite.width * scale;
     canvas.height = sprite.height * scale;
@@ -39,6 +36,7 @@ const wfc_form = document.querySelector("form"); //only works cuz its the only f
 wfc_form.addEventListener('submit', (evt) => {
     evt.preventDefault(); 
 
+    //get some form data
     const data = new FormData(wfc_form);
 
     var sliceWidth: number = +(data.get('slice-width') as string); //convert to number
@@ -47,7 +45,6 @@ wfc_form.addEventListener('submit', (evt) => {
     console.log({sliceWidth, sliceHeight, spriteWrap});
 
     //generate everything
-
     var s = new Sprite(5,5,pixels,spriteWrap)
     var wfc = new WFC(s)
 

@@ -3,14 +3,19 @@ import Sprite from './sprite.js';
 export default class WFC {
 
     sprite: Sprite;
+    tile_table: Array<Sprite>; //of the form tile_index: Sprite
+    adjacency: Array<Record<number,number>>; //of the form tile_index: [adjacent_tileIndex: frequency_hits]
 
     constructor(sprite: Sprite) {
         this.sprite = sprite;
+        this.tile_table = [];
+        this.adjacency = [];
     }
     
-
+    //gets all enumerations of the main sprite and indexes each subsprite as well as generating adjacncy rules for each subsprite
     imageProcessor(sliceWidth: number, sliceHeight: number): Sprite[] { //takes in an image and outputs all enumerations of tiles
 
+        //handle wrapping sprites
         var offsetX = 0;
         var offsetY = 0;
         if(!this.sprite.wrapSprite) {
