@@ -4,11 +4,13 @@ export default class Sprite {
     width: number;
     height: number;
     pixels: string[];
+    wrapSprite: boolean;
 
-    constructor(width: number, height: number, pixels?: string[]) {
+    constructor(width: number, height: number, pixels?: string[], wrapSprite?: boolean) {
         this.width = width;
         this.height = height;
         this.pixels = pixels || new Array(width*height).fill('#000000');
+        this.wrapSprite = wrapSprite || false;
     }
 
     getPixel(x: number, y: number): string {
@@ -32,11 +34,6 @@ export default class Sprite {
     //width and height must be positive
     slice(x: number, y: number, width: number, height: number): Sprite {
         var sliced = new Array();
-
-        /*
-        var w_inc = width/Math.abs(width); //find if width and height are negative
-        var h_inc = height/Math.abs(height);
-        */
 
         var y_ind = y;
         for (var j = 0; j < height; j++) {
