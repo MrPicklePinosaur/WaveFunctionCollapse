@@ -1,8 +1,10 @@
-export default class WFC {
-    constructor(sprite) {
+"use strict";
+exports.__esModule = true;
+var WFC = /** @class */ (function () {
+    function WFC(sprite) {
         this.sprite = sprite;
     }
-    imageProcessor(sliceWidth, sliceHeight) {
+    WFC.prototype.imageProcessor = function (sliceWidth, sliceHeight) {
         var offsetX = 0;
         var offsetY = 0;
         if (!this.sprite.wrapSprite) {
@@ -16,5 +18,7 @@ export default class WFC {
             }
         }
         return tiles;
-    }
-}
+    };
+    return WFC;
+}());
+exports["default"] = WFC;

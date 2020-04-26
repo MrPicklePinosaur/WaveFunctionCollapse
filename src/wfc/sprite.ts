@@ -9,11 +9,19 @@ export default class Sprite {
     constructor(width: number, height: number, pixels?: string[], wrapSprite?: boolean) {
         this.width = width;
         this.height = height;
-        this.pixels = pixels || new Array(width*height).fill('#000000');
+        this.pixels = pixels || this.emptyPixels(width,height);
         this.wrapSprite = wrapSprite || false;
     }
 
-    getPixel(x: number, y: number): string {
+    emptyPixels(width: number, height: number): string[] {
+        var arr = new Array<string>(width*height);
+        for (var i = 0; i < width*height; i++) {
+            arr[i] = '#000000';
+        }
+        return arr
+    } 
+
+    getPixel(x: number, y: number): String {
         var ind = x + y*this.width;
         if (ind < 0 || ind > this.width*this.height) {
             console.warn(`Invalid position on sprite: (${x},${y})`);

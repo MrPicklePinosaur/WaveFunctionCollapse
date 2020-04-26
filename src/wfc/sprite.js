@@ -1,28 +1,37 @@
-export default class Sprite {
-    constructor(width, height, pixels, wrapSprite) {
+"use strict";
+exports.__esModule = true;
+var Sprite = /** @class */ (function () {
+    function Sprite(width, height, pixels, wrapSprite) {
         this.width = width;
         this.height = height;
-        this.pixels = pixels || new Array(width * height).fill('#000000');
+        this.pixels = pixels || this.emptyPixels(width, height);
         this.wrapSprite = wrapSprite || false;
     }
-    getPixel(x, y) {
+    Sprite.prototype.emptyPixels = function (width, height) {
+        var arr = new Array(width * height);
+        for (var i = 0; i < width * height; i++) {
+            arr[i] = '#000000';
+        }
+        return arr;
+    };
+    Sprite.prototype.getPixel = function (x, y) {
         var ind = x + y * this.width;
         if (ind < 0 || ind > this.width * this.height) {
-            console.warn(`Invalid position on sprite: (${x},${y})`);
+            console.warn("Invalid position on sprite: (" + x + "," + y + ")");
             return '#000000';
         }
         return this.pixels[ind];
-    }
-    setPixel(x, y, color) {
+    };
+    Sprite.prototype.setPixel = function (x, y, color) {
         var ind = x + y * this.width;
         if (ind < 0 || ind > this.width * this.height) {
-            console.warn(`Invalid position on sprite: (${x},${y})`);
+            console.warn("Invalid position on sprite: (" + x + "," + y + ")");
             return;
         }
         this.pixels[ind] = color;
-    }
+    };
     //width and height must be positive
-    slice(x, y, width, height) {
+    Sprite.prototype.slice = function (x, y, width, height) {
         var sliced = new Array();
         var y_ind = y;
         for (var j = 0; j < height; j++) {
@@ -41,5 +50,7 @@ export default class Sprite {
             }
         }
         return new Sprite(width, height, sliced);
-    }
-}
+    };
+    return Sprite;
+}());
+exports["default"] = Sprite;

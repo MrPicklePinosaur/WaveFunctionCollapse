@@ -1,1 +1,0 @@
-import WFC from "../wfc/wfc.js";
