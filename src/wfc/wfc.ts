@@ -1,5 +1,6 @@
 import Sprite from './sprite.js';
 
+
 export default class WFC {
 
     sprite: Sprite;
@@ -8,7 +9,8 @@ export default class WFC {
 
     indexed_sprite: Array<number>;
     tile_table: Array<string[]>; //of the form tile_index: pixel_data, also, we're using the index in the array as the id/index
-    adjacency: Array<Record<number,number>>; //of the form tile_index: {adjacent_tileIndex: frequency_hits}
+    adjacency: Array<Array<Record<number,number>>>; //of the form tile_index: [ direction: {adjacent_tileIndex: frequency_hits}]
+    //adjacency: Array<Record<number,AdjacencyData>>;
 
     constructor(sprite: Sprite, sliceWidth: number, sliceHeight: number) {
         this.sprite = sprite;
@@ -17,6 +19,7 @@ export default class WFC {
         this.sliceHeight = sliceWidth;
 
         this.tile_table = [];
+        //this.adjacency = [[ [1,0], {} ],[ [0,1], {} ],[ [-1,0], {} ],[ [0,-1], {} ]];
         this.adjacency = [];
     }
     
@@ -42,8 +45,10 @@ export default class WFC {
                 var curPixelIndex = this.getPixelIndexAtPosition(i,j);
 
                 //GENERATE frequency hits =-=-=-=-=-=-=-=-=
+                const dirs = [[1,0],[0,1],[-1,0],[0,-1]];
+                for (var d = 0; d < dirs.length; d++) {//for each valid direction
 
-                for (var dir of [[1,0],[0,1],[-1,0],[0,-1]]) { //for each valid direction
+                    var dir = dirs[d];
 
                     var newPos = [ i+dir[0], j+dir[1] ];
 
@@ -64,12 +69,12 @@ export default class WFC {
                     //add frequency hint to curPixel's dict of frequncy hints
 
                     //check if the newPixel has already been hit before
-                    if (this.adjacency[curPixelIndex][newPixelIndex] == null) {
+                    if (this.adjacency[curPixelIndex][d][newPixelIndex] == null) {
                         //if not, set the hit count to 1
-                        this.adjacency[curPixelIndex][newPixelIndex] = 1;
+                        this.adjacency[curPixelIndex][d][newPixelIndex] = 1;
                     } else {
                         //otherwise increment
-                        this.adjacency[curPixelIndex][newPixelIndex] += 1;
+                        this.adjacency[curPixelIndex][d][newPixelIndex] += 1;
                     }
 
                 }
@@ -93,7 +98,7 @@ export default class WFC {
         //if the pixel pattern was not found, add it
         if (index == -1) {
             this.tile_table.push(pixels);
-            this.adjacency.push({}); //don't forget to also add a new entry in adjacency hints
+            this.adjacency.push([{},{},{},{}]); //don't forget to also add a new entry in adjacency hints
             index = this.tile_table.length-1; //set the current index as the last position
         }
 
@@ -118,23 +123,5 @@ export default class WFC {
         return this.indexed_sprite[pos];
     }
 
-    /*
-    getSurroundingTiles(x: number, y: number): Array<[number, number]> {
-        var dirs = [];
-
-        for (var dir of [[1,0],[0,1],[-1,0],[0,-1]]) { //for each direction
-
-            var newPos = [ x+dir[0], y+dir[1] ];
-
-            //if direction is invalid
-            if (newPos[0] < 0 || newPos[0] > outputWidth-1 || newPos[1] < 0 || newPos[1] > outputHeight-1) {
-                continue;
-            }
-
-        }
-
-        return dirs;
-    }
-    */
 
 }

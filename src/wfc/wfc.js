@@ -2,11 +2,13 @@
 exports.__esModule = true;
 var sprite_js_1 = require("./sprite.js");
 var WFC = /** @class */ (function () {
+    //adjacency: Array<Record<number,AdjacencyData>>;
     function WFC(sprite, sliceWidth, sliceHeight) {
         this.sprite = sprite;
         this.sliceWidth = sliceWidth;
         this.sliceHeight = sliceWidth;
         this.tile_table = [];
+        //this.adjacency = [[ [1,0], {} ],[ [0,1], {} ],[ [-1,0], {} ],[ [0,-1], {} ]];
         this.adjacency = [];
     }
     //gets all enumerations of the main sprite and indexes each subsprite as well as generating adjacncy rules for each subsprite
@@ -24,8 +26,9 @@ var WFC = /** @class */ (function () {
             for (var i = 0; i < outputWidth; i++) {
                 var curPixelIndex = this.getPixelIndexAtPosition(i, j);
                 //GENERATE frequency hits =-=-=-=-=-=-=-=-=
-                for (var _i = 0, _a = [[1, 0], [0, 1], [-1, 0], [0, -1]]; _i < _a.length; _i++) { //for each valid direction
-                    var dir = _a[_i];
+                var dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+                for (var d = 0; d < dirs.length; d++) { //for each valid direction
+                    var dir = dirs[d];
                     var newPos = [i + dir[0], j + dir[1]];
                     //if wrap is off and direction is invalid
                     if (!this.sprite.wrapSprite && (newPos[0] < 0 || newPos[0] > outputWidth - 1 || newPos[1] < 0 || newPos[1] > outputHeight - 1)) {
@@ -47,13 +50,13 @@ var WFC = /** @class */ (function () {
                     var newPixelIndex = this.getPixelIndexAtPosition(newPos[0], newPos[1]);
                     //add frequency hint to curPixel's dict of frequncy hints
                     //check if the newPixel has already been hit before
-                    if (this.adjacency[curPixelIndex][newPixelIndex] == null) {
+                    if (this.adjacency[curPixelIndex][d][newPixelIndex] == null) {
                         //if not, set the hit count to 1
-                        this.adjacency[curPixelIndex][newPixelIndex] = 1;
+                        this.adjacency[curPixelIndex][d][newPixelIndex] = 1;
                     }
                     else {
                         //otherwise increment
-                        this.adjacency[curPixelIndex][newPixelIndex] += 1;
+                        this.adjacency[curPixelIndex][d][newPixelIndex] += 1;
                     }
                 }
             }
@@ -71,7 +74,7 @@ var WFC = /** @class */ (function () {
         //if the pixel pattern was not found, add it
         if (index == -1) {
             this.tile_table.push(pixels);
-            this.adjacency.push({}); //don't forget to also add a new entry in adjacency hints
+            this.adjacency.push([{}, {}, {}, {}]); //don't forget to also add a new entry in adjacency hints
             index = this.tile_table.length - 1; //set the current index as the last position
         }
         return index; //return index of -1 if not found
