@@ -1,7 +1,7 @@
 "use strict";
 exports.__esModule = true;
-var wfc_js_1 = require("./wfc.js");
 var sprite_js_1 = require("./sprite.js");
+var wfc_js_1 = require("./wfc.js");
 // <reference path="./sprite.js" />
 // <reference path="./wfc.js" />
 function drawSprite(sprite, canvas, scale) {
@@ -26,7 +26,15 @@ var pixels = [
     black, black, black, black, black,
     green, green, green, green, green,
 ];
-var s = new sprite_js_1["default"](5, 5);
+var s = new sprite_js_1["default"](5, 5, pixels, true);
 var wfc = new wfc_js_1["default"](s);
-console.log(wfc.imageProcessor(3, 3));
 drawSprite(s, document.getElementById('main-canvas'), 20);
+var sliced = wfc.imageProcessor(3, 3);
+console.log(sliced);
+var sliced_div = document.getElementById('sliced-div');
+for (var i = 0; i < sliced.length; i++) {
+    var new_canvas = document.createElement('canvas');
+    new_canvas.id = 'sliced-sprite';
+    drawSprite(sliced[i], new_canvas, 20);
+    sliced_div.appendChild(new_canvas);
+}
