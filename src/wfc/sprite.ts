@@ -42,16 +42,29 @@ export default class Sprite {
     }
 
     //width and height must be positive
-    slice(x: number, y: number, width: number, height: number): string[] {
+    slice(x: number, y: number, sliceWidth: number, sliceHeight: number): string[] {
         var self = this;
+
+        //check to see if slice is even valid
+        var offsetX = 0;
+        var offsetY = 0;
+        if (this.wrapSprite) {
+            offsetX = sliceWidth-1;
+            offsetY = sliceHeight-1;
+        }
+        if (x < 0 || x > this.width-sliceWidth || y < 0 || y > this.height-sliceHeight) {
+            console.warn(`INVALID SLICE PARAMETERS ${{x,y,sliceWidth,sliceHeight}}`);
+            return null;
+        }
+
         var sliced = new Array();
 
         
         var y_ind = y;
-        for (var j = 0; j < height; j++) {
+        for (var j = 0; j < sliceHeight; j++) {
             
             var x_ind = x;
-            for (var i = 0; i < width; i++) {
+            for (var i = 0; i < sliceWidth; i++) {
 
                 var ind = x_ind+y_ind*self.width;
                 sliced.push(self.pixels[ind]);

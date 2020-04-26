@@ -6,9 +6,6 @@ export default class WFC {
     sliceWidth: number;
     sliceHeight: number;
 
-    outputWidth: number; //used for size of indexed array depending on if the sprite has wrapping on or off
-    outputHeight: number;
-
     indexed_sprite: Array<number>;
     tile_table: Array<string[]>; //of the form tile_index: pixel_data
     adjacency: Array<Record<number,number>>; //of the form tile_index: [adjacent_tileIndex: frequency_hits]
@@ -19,14 +16,6 @@ export default class WFC {
         this.sliceWidth = sliceWidth;
         this.sliceHeight = sliceWidth;
 
-        //handle wrapping sprites
-        this.outputWidth = this.sprite.width;
-        this.outputWidth = this.sprite.height;
-        if(!this.sprite.wrapSprite) { //if wrapping is off
-            this.outputWidth -= sliceWidth;
-            this.outputHeight -= sliceHeight;
-        }
-
         this.tile_table = [];
         this.adjacency = [];
     }
@@ -35,18 +24,21 @@ export default class WFC {
     //gets all enumerations of the main sprite and indexes each subsprite as well as generating adjacncy rules for each subsprite
     imageProcessor(): void { 
 
-        this.indexed_sprite = new Array<number>(this.outputWidth*this.outputHeight);
+        //handle wrapping sprites
+        var outputWidth = this.sprite.width;
+        var outputHeight = this.sprite.height;
+        if(!this.sprite.wrapSprite) { //if wrapping is off
+            outputWidth -= this.sliceWidth;
+            outputHeight -= this.sliceHeight;
+        }
+
+        this.indexed_sprite = new Array<number>(outputWidth*outputHeight);
 
 
-        for (var j = 0; j < this.outputHeight; j++) {
-            for (var i = 0; i < this.outputWidth; i++) {
+        for (var j = 0; j < outputHeight; j++) {
+            for (var i = 0; i < outputWidth; i++) {
 
-                var subSprite: string[] = this.sprite.slice(i,j,this.sliceWidth,this.sliceHeight);
-
-                //INDEX the sprite =-=-=-=-=-=-=-=-=
-
-                //check to see if sprite is in the tile_table already and get it's index
-                var spriteInd = this.getPixelIndex(subSprite);
+                var curPixelIndex = this.getPixelIndexAtPosition(i,j);
 
                 //GENERATE frequency hits =-=-=-=-=-=-=-=-=
 
@@ -55,12 +47,13 @@ export default class WFC {
                     var newPos = [ i+dir[0], j+dir[1] ];
 
                     //if direction is invalid
-                    if (newPos[0] < 0 || newPos[0] > this.outputWidth-1 || newPos[1] < 0 || newPos[1] > this.outputHeight-1) {
+                    if (newPos[0] < 0 || newPos[0] > outputWidth-1 || newPos[1] < 0 || newPos[1] > outputHeight-1) {
                         continue;
                     }
 
+                    var newPixelIndex = this.getPixelIndexAtPosition(newPos[0],newPos[1]);
 
-
+                    //add frequency hint to curPixel's dict of frequncy hints
 
                 }
  
@@ -96,13 +89,16 @@ export default class WFC {
         }
 
         //check if the tile at position (x,y) has been indexed yet
-        var ind = x+y*this.sprite.width;
-        if (this.indexed_sprite[ind] == null) {
+        var pos = x+y*this.sprite.width;
+        if (this.indexed_sprite[pos] == null) {
             //if it hasnt been indexed, index it and then return
             var subSprite: string[] = this.sprite.slice(x,y,this.sliceWidth,this.sliceHeight);
+            var pixelIndex = this.getPixelIndex(subSprite);
+            this.indexed_sprite[pos] = pixelIndex;
+            return pixelIndex;
         } 
         //if it has already been indexed, just return the index/id of the tile
-        return this.indexed_sprite[ind];
+        return this.indexed_sprite[pos];
     }
 
 }
