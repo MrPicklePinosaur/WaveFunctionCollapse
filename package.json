@@ -1,11 +1,24 @@
 {
-  "name": "wfc",
+  "name": "wave_function_collapse",
   "version": "1.0.0",
   "description": "simple webapp to explore the wave function collapse algorithm",
-  "main": "pic.js",
+  "main": "index.js",
   "scripts": {
-    "test": "start"
+    "test": "start",
+    "build": "webpack src/wfc/main.js"
   },
   "author": "pinosaur",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrPicklePinosaur/WaveFunctionCollapse.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MrPicklePinosaur/WaveFunctionCollapse/issues"
+  },
+  "homepage": "https://github.com/MrPicklePinosaur/WaveFunctionCollapse#readme",
+  "devDependencies": {
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  }
 }
