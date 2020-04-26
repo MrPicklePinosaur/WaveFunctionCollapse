@@ -11,11 +11,23 @@
 
         <h1> WFC </h1>
 
+        <p>Options</p>
+        <form id="wfc-options">
+            <label for="slice-width">slice width</label><br>
+            <input type="text" name="slice-width"><br>
+            <label for="slice-height">slice height</label><br>
+            <input type="text" name="slice-height"><br>
+            <label for="sprite-wrap">sprite wrap toggle</label><br>
+            <input type="checkbox" name="sprite-wrap"><br>
+
+            <input type="submit" value="Generate!">
+        </form>
+        
         <p>Main Sprite</p>
         <canvas id="main-canvas"></canvas>
 
         <p>Sliced Sprites</p>
-        <div id="sliced-div"></div>
+        <div id="sliced-canvas"></div>
 
         <!--button id='color-button'></button-->
 

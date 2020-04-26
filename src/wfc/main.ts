@@ -30,19 +30,41 @@ var pixels = [
     black, black, black, black, black,
     green, green, green, green, green,
 ];
-var s = new Sprite(5,5,pixels,true)
-var wfc = new WFC(s)
 
-drawSprite(s,document.getElementById('main-canvas'),20);
+const main_canvas = document.getElementById('main-canvas');
+const sliced_canvas = document.getElementById('sliced-canvas');
+const wfc_form = document.querySelector("form"); //only works cuz its the only form
 
-var sliced = wfc.imageProcessor(3,3);
-console.log(sliced);
-var sliced_div = document.getElementById('sliced-div');
+//preliminary stuff
+wfc_form.addEventListener('submit', (evt) => {
+    evt.preventDefault(); 
 
-for (var i = 0; i < sliced.length; i++) {
+    const data = new FormData(wfc_form);
 
-    var new_canvas = document.createElement('canvas');
-    new_canvas.id = 'sliced-sprite';
-    drawSprite(sliced[i],new_canvas,20);
-    sliced_div.appendChild(new_canvas);
+    var sliceWidth: number = +(data.get('slice-width') as string); //convert to number
+    var sliceHeight: number = +(data.get('slice-height') as string);
+    var spriteWrap: boolean = (data.get('sprite-wrap') as string) != null; //returns "on" for true and null for false
+    console.log({sliceWidth, sliceHeight, spriteWrap});
+
+    //generate everything
+
+    var s = new Sprite(5,5,pixels,spriteWrap)
+    var wfc = new WFC(s)
+
+    drawSprite(s,main_canvas,20);
+
+    //sample each point on sprite and draw it
+    var sliced = wfc.imageProcessor(sliceWidth,sliceHeight);
+
+    sliced_canvas.innerHTML = ''; //clear all child nodes
+    for (var i = 0; i < sliced.length; i++) {
+
+        var new_canvas = document.createElement('canvas');
+        new_canvas.id = 'sliced-sprite';
+        drawSprite(sliced[i],new_canvas,20);
+        sliced_canvas.appendChild(new_canvas);
 }
+});
+
+
+
