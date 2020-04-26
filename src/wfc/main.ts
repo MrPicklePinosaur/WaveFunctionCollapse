@@ -58,10 +58,12 @@ wfc_form.addEventListener('submit', (evt) => {
     sliced_canvas.innerHTML = ''; //clear all child nodes
     for (var i = 0; i < wfc.tile_table.length; i++) {
 
+        console.log(wfc.adjacency[i]);
         var new_canvas = document.createElement('canvas');
         new_canvas.id = 'sliced-sprite';
         drawSprite(new Sprite(sliceWidth, sliceHeight,wfc.tile_table[i]),new_canvas,20);
         sliced_canvas.appendChild(new_canvas);
+
     
 }
 });

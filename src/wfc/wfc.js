@@ -24,12 +24,25 @@ var WFC = /** @class */ (function () {
             for (var i = 0; i < outputWidth; i++) {
                 var curPixelIndex = this.getPixelIndexAtPosition(i, j);
                 //GENERATE frequency hits =-=-=-=-=-=-=-=-=
-                for (var _i = 0, _a = [[1, 0], [0, 1], [-1, 0], [0, -1]]; _i < _a.length; _i++) { //for each direction
+                for (var _i = 0, _a = [[1, 0], [0, 1], [-1, 0], [0, -1]]; _i < _a.length; _i++) { //for each valid direction
                     var dir = _a[_i];
                     var newPos = [i + dir[0], j + dir[1]];
-                    //if direction is invalid
-                    if (newPos[0] < 0 || newPos[0] > outputWidth - 1 || newPos[1] < 0 || newPos[1] > outputHeight - 1) {
+                    //if wrap is off and direction is invalid
+                    if (!this.sprite.wrapSprite && (newPos[0] < 0 || newPos[0] > outputWidth - 1 || newPos[1] < 0 || newPos[1] > outputHeight - 1)) {
                         continue;
+                    }
+                    //otherwise wrap is on, and we want to wrap back around
+                    if (newPos[0] < 0) {
+                        newPos[0] += outputWidth;
+                    }
+                    else if (newPos[0] > outputWidth - 1) {
+                        newPos[0] -= outputWidth;
+                    }
+                    if (newPos[1] < 0) {
+                        newPos[1] += outputHeight;
+                    }
+                    else if (newPos[1] > outputHeight - 1) {
+                        newPos[1] -= outputHeight;
                     }
                     var newPixelIndex = this.getPixelIndexAtPosition(newPos[0], newPos[1]);
                     //add frequency hint to curPixel's dict of frequncy hints

@@ -43,14 +43,21 @@ export default class WFC {
 
                 //GENERATE frequency hits =-=-=-=-=-=-=-=-=
 
-                for (var dir of [[1,0],[0,1],[-1,0],[0,-1]]) { //for each direction
+                for (var dir of [[1,0],[0,1],[-1,0],[0,-1]]) { //for each valid direction
 
                     var newPos = [ i+dir[0], j+dir[1] ];
 
-                    //if direction is invalid
-                    if (newPos[0] < 0 || newPos[0] > outputWidth-1 || newPos[1] < 0 || newPos[1] > outputHeight-1) {
+                    //if wrap is off and direction is invalid
+                    if (!this.sprite.wrapSprite && (newPos[0] < 0 || newPos[0] > outputWidth-1 || newPos[1] < 0 || newPos[1] > outputHeight-1)) {
                         continue;
                     }
+
+                    //otherwise wrap is on, and we want to wrap back around
+                    if (newPos[0] < 0) { newPos[0] += outputWidth; }
+                    else if (newPos[0] > outputWidth-1) { newPos[0] -= outputWidth; }
+                    if (newPos[1] < 0) { newPos[1] += outputHeight; }
+                    else if (newPos[1] > outputHeight-1) { newPos[1] -= outputHeight; }
+
 
                     var newPixelIndex = this.getPixelIndexAtPosition(newPos[0],newPos[1]);
 
@@ -110,5 +117,24 @@ export default class WFC {
         //if it has already been indexed, just return the index/id of the tile
         return this.indexed_sprite[pos];
     }
+
+    /*
+    getSurroundingTiles(x: number, y: number): Array<[number, number]> {
+        var dirs = [];
+
+        for (var dir of [[1,0],[0,1],[-1,0],[0,-1]]) { //for each direction
+
+            var newPos = [ x+dir[0], y+dir[1] ];
+
+            //if direction is invalid
+            if (newPos[0] < 0 || newPos[0] > outputWidth-1 || newPos[1] < 0 || newPos[1] > outputHeight-1) {
+                continue;
+            }
+
+        }
+
+        return dirs;
+    }
+    */
 
 }
