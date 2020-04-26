@@ -21,7 +21,7 @@ export default class Sprite {
         return arr
     } 
 
-    getPixel(x: number, y: number): String {
+    getPixel(x: number, y: number): string {
         var ind = x + y*this.width;
         if (ind < 0 || ind > this.width*this.height) {
             console.warn(`Invalid position on sprite: (${x},${y})`);
