@@ -1,5 +1,7 @@
-import WFC from "./wfc.js";
+
 import Sprite from "./sprite.js";
+import WFC from "./wfc.js";
+
 // <reference path="./sprite.js" />
 // <reference path="./wfc.js" />
 

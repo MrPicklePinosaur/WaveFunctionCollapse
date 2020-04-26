@@ -1,7 +1,9 @@
-//import WFC from "./wfc.js";
-//import Sprite from "./sprite.js";
-/// <reference path="./sprite.js" />
-/// <reference path="./wfc.js" />
+"use strict";
+exports.__esModule = true;
+var wfc_js_1 = require("./wfc.js");
+var sprite_js_1 = require("./sprite.js");
+// <reference path="./sprite.js" />
+// <reference path="./wfc.js" />
 function drawSprite(sprite, canvas, scale) {
     canvas.width = sprite.width * scale;
     canvas.height = sprite.height * scale;
@@ -24,7 +26,7 @@ var pixels = [
     black, black, black, black, black,
     green, green, green, green, green,
 ];
-var s = new Sprite(5, 5);
-var wfc = new WFC(s);
+var s = new sprite_js_1["default"](5, 5);
+var wfc = new wfc_js_1["default"](s);
 console.log(wfc.imageProcessor(3, 3));
-drawSprite(s, document.getElementById('main-canvas'), 5);
+drawSprite(s, document.getElementById('main-canvas'), 20);

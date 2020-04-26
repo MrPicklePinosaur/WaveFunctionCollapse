@@ -22,7 +22,7 @@ export default class WFC {
 
         for (var j = 0; j < this.sprite.height-offsetY; j++) {
             for (var i = 0; i < this.sprite.width-offsetX; i++) {
-                
+
                 tiles.push(this.sprite.slice(i,j,sliceWidth,sliceHeight));
             }
         }
