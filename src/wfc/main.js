@@ -17,12 +17,21 @@ var black = '#000000';
 var red = '#FF0000';
 var green = '#00FF00';
 var blue = '#0000FF';
-var pixels = [
+var bluish = '#0073FF';
+/*var pixels = [
     red, red, red, red, red,
     black, black, black, black, black,
     blue, blue, blue, blue, blue,
     black, black, black, black, black,
     green, green, green, green, green,
+];
+*/
+var pixels = [
+    black, bluish, black, black, black,
+    black, bluish, black, black, black,
+    black, bluish, black, black, black,
+    bluish, bluish, bluish, bluish, bluish,
+    black, bluish, black, black, black,
 ];
 var main_canvas = document.getElementById('main-canvas');
 var sliced_canvas = document.getElementById('sliced-canvas');
@@ -41,6 +50,7 @@ wfc_form.addEventListener('submit', function (evt) {
     var wfc = new wfc_js_1["default"](s, sliceWidth, sliceHeight);
     drawSprite(s, main_canvas, 20);
     wfc.imageProcessor();
+    console.log(wfc.calculateEntropyAt(0, 0));
     //sample each point on sprite and draw it
     sliced_canvas.innerHTML = ''; //clear all child nodes
     for (var i = 0; i < wfc.tile_table.length; i++) {
