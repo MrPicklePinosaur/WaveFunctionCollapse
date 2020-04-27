@@ -6,44 +6,42 @@ export default class WFC {
     sprite: Sprite;
     sliceWidth: number;
     sliceHeight: number;
-
     outputWidth: number;
     outputHeight: number;
 
     indexed_sprite: Array<number>;
     tile_table: Array<string[]>; //of the form tile_index: pixel_data, also, we're using the index in the array as the id/index
     adjacency: Array<Array<Record<number,number>>>; //of the form tile_index: [ direction: {adjacent_tileIndex: frequency_hits}]
-    //adjacency: Array<Record<number,AdjacencyData>>;
-    entropy_cache: Array<number>; //an array that stores the entropy of every cell
+    outputTiles: Array<Array<number>>; //holds all possible tiles for every pixel on output sprite
+    //entropy_cache: Array<number>; //an array that stores the entropy of every cell
 
-    constructor(sprite: Sprite, sliceWidth: number, sliceHeight: number) {
+    constructor(sprite: Sprite, sliceWidth: number, sliceHeight: number, outputWidth: number, outputHeight: number) {
         this.sprite = sprite;
 
         this.sliceWidth = sliceWidth;
-        this.sliceHeight = sliceWidth;
+        this.sliceHeight = sliceHeight;
+        this.outputWidth = outputWidth;
+        this.outputHeight = outputHeight;
 
-        //handle wrapping sprites
-        //default to wrapping on
-        this.outputWidth = this.sprite.width;
-        this.outputHeight = this.sprite.height;
-        if(!this.sprite.wrapSprite) { //if wrapping is off
-            this.outputWidth -= (this.sliceWidth-1);
-            this.outputHeight -= (this.sliceHeight-1);
-        }
-
-        this.indexed_sprite = new Array<number>(this.outputWidth*this.outputHeight);
         this.tile_table = [];
         //this.adjacency = [[ [1,0], {} ],[ [0,1], {} ],[ [-1,0], {} ],[ [0,-1], {} ]];
         this.adjacency = [];
-        this.entropy_cache = new Array<number>(this.outputWidth*this.outputHeight);
+
+        //TODO: account for sprite wrapping
+        this.outputTiles = new Array<Array<number>>(this.outputWidth*this.outputHeight);
+
+
+        //this.entropy_cache = new Array<number>(this.outputWidth*this.outputHeight);
     }
     
 
     //gets all enumerations of the main sprite and indexes each subsprite as well as generating adjacncy rules for each subsprite
     imageProcessor(): void { 
 
-        for (var j = 0; j < this.outputHeight; j++) {
-            for (var i = 0; i < this.outputWidth; i++) {
+        this.indexed_sprite = new Array<number>(this.sprite.width*this.sprite.height);
+
+        for (var j = 0; j < this.sprite.height; j++) {
+            for (var i = 0; i < this.sprite.width; i++) {
 
                 var curPixelIndex = this.getPixelIndexAtPosition(i,j);
 
@@ -55,16 +53,11 @@ export default class WFC {
 
                     var newPos = [ i+dir[0], j+dir[1] ];
 
-                    //if wrap is off and direction is invalid
-                    if (!this.sprite.wrapSprite && (newPos[0] < 0 || newPos[0] > this.outputWidth-1 || newPos[1] < 0 || newPos[1] > this.outputHeight-1)) {
-                        continue;
-                    }
-
-                    //otherwise wrap is on, and we want to wrap back around
-                    if (newPos[0] < 0) { newPos[0] += this.outputWidth; }
-                    else if (newPos[0] > this.outputWidth-1) { newPos[0] -= this.outputWidth; }
-                    if (newPos[1] < 0) { newPos[1] += this.outputHeight; }
-                    else if (newPos[1] > this.outputHeight-1) { newPos[1] -= this.outputHeight; }
+                    //wrap back around
+                    if (newPos[0] < 0) { newPos[0] += this.sprite.width; }
+                    else if (newPos[0] > this.sprite.width-1) { newPos[0] -= this.sprite.width; }
+                    if (newPos[1] < 0) { newPos[1] += this.sprite.height; }
+                    else if (newPos[1] > this.sprite.height-1) { newPos[1] -= this.sprite.height; }
 
 
                     var newPixelIndex = this.getPixelIndexAtPosition(newPos[0],newPos[1]);
@@ -81,11 +74,9 @@ export default class WFC {
                     }
 
                 }
- 
 
             }
         }
-
     }
 
 
@@ -126,6 +117,11 @@ export default class WFC {
         return this.indexed_sprite[pos];
     }
 
+    collapse() {
+        
+    }
+
+    /*
     calculateEntropyAt(x: number, y: number) {
 
         //merge all surrounding cells adjacency data
@@ -167,6 +163,7 @@ export default class WFC {
 
         return mergedAdjacenecy;
     }
+    */
 
 
 }

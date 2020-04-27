@@ -4,13 +4,11 @@ export default class Sprite {
     width: number;
     height: number;
     pixels: string[];
-    wrapSprite: boolean;
 
-    constructor(width: number, height: number, pixels?: string[], wrapSprite?: boolean) {
+    constructor(width: number, height: number, pixels?: string[]) {
         this.width = width;
         this.height = height;
         this.pixels = pixels || Sprite.emptyPixels(width,height);
-        this.wrapSprite = wrapSprite || false;
     }
 
     static emptyPixels(width: number, height: number): string[] {
@@ -45,21 +43,13 @@ export default class Sprite {
     slice(x: number, y: number, sliceWidth: number, sliceHeight: number): string[] {
         var self = this;
 
-        //check to see if slice is even valid
-        var offsetX = 0;
-        var offsetY = 0;
-        if (!this.wrapSprite) {
-            offsetX = sliceWidth-1;
-            offsetY = sliceHeight-1;
-        }
-        if (x < 0 || x > this.width-offsetX || y < 0 || y > this.height-offsetY) {
+        if (x < 0 || x > this.width || y < 0 || y > this.height) {
             console.warn(`INVALID SLICE PARAMETERS ${x},${y},${sliceWidth},${sliceHeight}`);
             return null;
         }
 
         var sliced = new Array();
 
-        
         var y_ind = y;
         for (var j = 0; j < sliceHeight; j++) {
             
