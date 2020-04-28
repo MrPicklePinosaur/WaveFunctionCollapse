@@ -43,18 +43,18 @@ wfc_form.addEventListener('submit', function (evt) {
     var data = new FormData(wfc_form);
     var sliceWidth = +data.get('slice-width'); //convert to number
     var sliceHeight = +data.get('slice-height');
-    var spriteWrap = data.get('sprite-wrap') != null; //returns "on" for true and null for false
     //console.log({sliceWidth, sliceHeight, spriteWrap});
     //generate everything
-    var s = new sprite_js_1["default"](5, 5, pixels, spriteWrap);
-    var wfc = new wfc_js_1["default"](s, sliceWidth, sliceHeight);
+    var s = new sprite_js_1["default"](5, 5, pixels);
+    var wfc = new wfc_js_1["default"](s, sliceWidth, sliceHeight, 20, 20);
     drawSprite(s, main_canvas, 20);
     wfc.imageProcessor();
-    console.log(wfc.calculateEntropyAt(0, 0));
+    wfc.computeFrequencyHints();
+    wfc.collapse();
     //sample each point on sprite and draw it
     sliced_canvas.innerHTML = ''; //clear all child nodes
     for (var i = 0; i < wfc.tile_table.length; i++) {
-        console.log(wfc.adjacency[i]);
+        //console.log(wfc.adjacency[i]);
         var new_canvas = document.createElement('canvas');
         new_canvas.id = 'sliced-sprite';
         drawSprite(new sprite_js_1["default"](sliceWidth, sliceHeight, wfc.tile_table[i]), new_canvas, 20);

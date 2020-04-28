@@ -2,50 +2,41 @@
 exports.__esModule = true;
 var sprite_js_1 = require("./sprite.js");
 var WFC = /** @class */ (function () {
-    function WFC(sprite, sliceWidth, sliceHeight) {
+    //entropy_cache: Array<number>; //an array that stores the entropy of every cell
+    function WFC(sprite, sliceWidth, sliceHeight, outputWidth, outputHeight) {
         this.sprite = sprite;
         this.sliceWidth = sliceWidth;
-        this.sliceHeight = sliceWidth;
-        //handle wrapping sprites
-        //default to wrapping on
-        this.outputWidth = this.sprite.width;
-        this.outputHeight = this.sprite.height;
-        if (!this.sprite.wrapSprite) { //if wrapping is off
-            this.outputWidth -= (this.sliceWidth - 1);
-            this.outputHeight -= (this.sliceHeight - 1);
-        }
-        this.indexed_sprite = new Array(this.outputWidth * this.outputHeight);
+        this.sliceHeight = sliceHeight;
+        this.outputWidth = outputWidth;
+        this.outputHeight = outputHeight;
         this.tile_table = [];
-        //this.adjacency = [[ [1,0], {} ],[ [0,1], {} ],[ [-1,0], {} ],[ [0,-1], {} ]];
         this.adjacency = [];
-        this.entropy_cache = new Array(this.outputWidth * this.outputHeight);
+        this.outputTiles = new Array(this.outputWidth * this.outputHeight);
+        //this.entropy_cache = new Array<number>(this.outputWidth*this.outputHeight);
     }
     //gets all enumerations of the main sprite and indexes each subsprite as well as generating adjacncy rules for each subsprite
     WFC.prototype.imageProcessor = function () {
-        for (var j = 0; j < this.outputHeight; j++) {
-            for (var i = 0; i < this.outputWidth; i++) {
+        this.indexed_sprite = new Array(this.sprite.width * this.sprite.height);
+        for (var j = 0; j < this.sprite.height; j++) {
+            for (var i = 0; i < this.sprite.width; i++) {
                 var curPixelIndex = this.getPixelIndexAtPosition(i, j);
                 //GENERATE frequency hits =-=-=-=-=-=-=-=-=
                 var dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]];
                 for (var d = 0; d < dirs.length; d++) { //for each valid direction
                     var dir = dirs[d];
                     var newPos = [i + dir[0], j + dir[1]];
-                    //if wrap is off and direction is invalid
-                    if (!this.sprite.wrapSprite && (newPos[0] < 0 || newPos[0] > this.outputWidth - 1 || newPos[1] < 0 || newPos[1] > this.outputHeight - 1)) {
-                        continue;
-                    }
-                    //otherwise wrap is on, and we want to wrap back around
+                    //wrap back around
                     if (newPos[0] < 0) {
-                        newPos[0] += this.outputWidth;
+                        newPos[0] += this.sprite.width;
                     }
-                    else if (newPos[0] > this.outputWidth - 1) {
-                        newPos[0] -= this.outputWidth;
+                    else if (newPos[0] > this.sprite.width - 1) {
+                        newPos[0] -= this.sprite.width;
                     }
                     if (newPos[1] < 0) {
-                        newPos[1] += this.outputHeight;
+                        newPos[1] += this.sprite.height;
                     }
-                    else if (newPos[1] > this.outputHeight - 1) {
-                        newPos[1] -= this.outputHeight;
+                    else if (newPos[1] > this.sprite.height - 1) {
+                        newPos[1] -= this.sprite.height;
                     }
                     var newPixelIndex = this.getPixelIndexAtPosition(newPos[0], newPos[1]);
                     //add frequency hint to curPixel's dict of frequncy hints
@@ -95,48 +86,33 @@ var WFC = /** @class */ (function () {
         //if it has already been indexed, just return the index/id of the tile
         return this.indexed_sprite[pos];
     };
-    WFC.prototype.calculateEntropyAt = function (x, y) {
-        //merge all surrounding cells adjacency data
-        var mergedAdjacenecy = {};
-        var dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]];
-        for (var d = 0; d < dirs.length; d++) { //for each valid direction
-            var dir = dirs[d];
-            var newPos = [x + dir[0], y + dir[1]];
-            //only choose valid surrounding tiles
-            if (!this.sprite.wrapSprite && (newPos[0] < 0 || newPos[0] > this.outputWidth - 1 || newPos[1] < 0 || newPos[1] > this.outputHeight - 1)) {
-                continue;
-            }
-            //otherwise wrap is on, and we want to wrap back around
-            if (newPos[0] < 0) {
-                newPos[0] += this.outputWidth;
-            }
-            else if (newPos[0] > this.outputWidth - 1) {
-                newPos[0] -= this.outputWidth;
-            }
-            if (newPos[1] < 0) {
-                newPos[1] += this.outputHeight;
-            }
-            else if (newPos[1] > this.outputHeight - 1) {
-                newPos[1] -= this.outputHeight;
-            }
-            var newD = d + 2; //flip the direction
-            if (newD > 3) {
-                newD -= 4;
-            }
-            if (newD < 0) {
-                newD += 4;
-            }
-            var adj_data = this.adjacency[newPos[0] + newPos[1] * this.sprite.width][newD];
-            Object.keys(adj_data).forEach(function (key) {
-                if (mergedAdjacenecy.hasOwnProperty(key)) { //if the merged data already exists
-                    mergedAdjacenecy[key] += adj_data[key];
-                }
-                else {
-                    mergedAdjacenecy[key] = adj_data[key];
-                }
-            });
+    WFC.prototype.computeFrequencyHints = function () {
+        //this.frequency = new Array<number>(this.tile_table.length).fill(0);
+        var _this = this;
+        //this.frequency = Array.from({length: this.tile_table.length}, (v,k) => 0);
+        this.frequency = new Array(this.tile_table.length);
+        for (var i = 0; i < this.frequency.length; i++) { //fill the array with 0, find an actual way to do this later
+            this.frequency[i] = 0;
         }
-        return mergedAdjacenecy;
+        this.indexed_sprite.forEach(function (element) {
+            _this.frequency[element] += 1;
+        });
+    };
+    WFC.prototype.collapse = function () {
+        //assume every single tile can appear anywhere at first
+        for (var i = 0; i < this.outputTiles.length; i++) {
+            this.outputTiles[i] = Array.from({ length: this.tile_table.length }, function (v, k) { return k; });
+        }
+    };
+    WFC.prototype.calculateEntropyAt = function (x, y) {
+        var possibleTiles = this.outputTiles[x + y * this.sprite.width];
+        var entropy = 0;
+        var W = this.indexed_sprite.length; //W is total weight
+        possibleTiles.forEach(function (w) {
+            entropy += w * Math.log2(w);
+        });
+        entropy = -1 / W + Math.log2(W);
+        return entropy;
     };
     return WFC;
 }());

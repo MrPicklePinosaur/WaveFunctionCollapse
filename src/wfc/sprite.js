@@ -1,11 +1,10 @@
 "use strict";
 exports.__esModule = true;
 var Sprite = /** @class */ (function () {
-    function Sprite(width, height, pixels, wrapSprite) {
+    function Sprite(width, height, pixels) {
         this.width = width;
         this.height = height;
         this.pixels = pixels || Sprite.emptyPixels(width, height);
-        this.wrapSprite = wrapSprite || false;
     }
     Sprite.emptyPixels = function (width, height) {
         var arr = new Array(width * height);
@@ -35,14 +34,7 @@ var Sprite = /** @class */ (function () {
     //width and height must be positive
     Sprite.prototype.slice = function (x, y, sliceWidth, sliceHeight) {
         var self = this;
-        //check to see if slice is even valid
-        var offsetX = 0;
-        var offsetY = 0;
-        if (!this.wrapSprite) {
-            offsetX = sliceWidth - 1;
-            offsetY = sliceHeight - 1;
-        }
-        if (x < 0 || x > this.width - offsetX || y < 0 || y > this.height - offsetY) {
+        if (x < 0 || x > this.width || y < 0 || y > this.height) {
             console.warn("INVALID SLICE PARAMETERS " + x + "," + y + "," + sliceWidth + "," + sliceHeight);
             return null;
         }

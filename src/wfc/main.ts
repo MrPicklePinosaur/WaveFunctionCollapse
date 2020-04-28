@@ -50,7 +50,6 @@ wfc_form.addEventListener('submit', (evt) => {
 
     var sliceWidth: number = +(data.get('slice-width') as string); //convert to number
     var sliceHeight: number = +(data.get('slice-height') as string);
-    var spriteWrap: boolean = (data.get('sprite-wrap') as string) != null; //returns "on" for true and null for false
     //console.log({sliceWidth, sliceHeight, spriteWrap});
 
     //generate everything
@@ -61,6 +60,8 @@ wfc_form.addEventListener('submit', (evt) => {
 
 
     wfc.imageProcessor();
+    wfc.computeFrequencyHints();
+    wfc.collapse();
     
     //sample each point on sprite and draw it
     sliced_canvas.innerHTML = ''; //clear all child nodes

@@ -11,6 +11,7 @@ export default class WFC {
 
     indexed_sprite: Array<number>;
     tile_table: Array<string[]>; //of the form tile_index: pixel_data, also, we're using the index in the array as the id/index
+    frequency: Array<number>; //keeps track of the amount of times each tile appears in the input image and generates a weight
     adjacency: Array<Array<Record<number,number>>>; //of the form tile_index: [ direction: {adjacent_tileIndex: frequency_hits}]
     outputTiles: Array<Array<number>>; //holds all possible tiles for every pixel on output sprite
     //entropy_cache: Array<number>; //an array that stores the entropy of every cell
@@ -24,10 +25,8 @@ export default class WFC {
         this.outputHeight = outputHeight;
 
         this.tile_table = [];
-        //this.adjacency = [[ [1,0], {} ],[ [0,1], {} ],[ [-1,0], {} ],[ [0,-1], {} ]];
         this.adjacency = [];
 
-        //TODO: account for sprite wrapping
         this.outputTiles = new Array<Array<number>>(this.outputWidth*this.outputHeight);
 
 
@@ -117,10 +116,43 @@ export default class WFC {
         return this.indexed_sprite[pos];
     }
 
-    collapse() {
-        
+    computeFrequencyHints() { //calculates the frequency each tile appears in the input sprite
+        //this.frequency = new Array<number>(this.tile_table.length).fill(0);
+        //this.frequency = Array.from({length: this.tile_table.length}, (v,k) => 0);
+
+        this.frequency = new Array<number>(this.tile_table.length);
+        //fill the array with 0, find an actual way to do this later
+        for (var i = 0; i < this.frequency.length; i++) { this.frequency[i] = 0; }
+
+        this.indexed_sprite.forEach(element => {
+            this.frequency[element] += 1;
+        });
     }
 
+    collapse() {
+        //assume every single tile can appear anywhere at first
+        for (var i = 0; i < this.outputTiles.length; i++) {
+            var possibleTiles = new Array<number>(this.tile_table.length);
+            for (var p = 0; p < possibleTiles.length; p++) { possibleTiles[p] = p; }
+            this.outputTiles[i] = possibleTiles;
+        }
+
+    }
+
+    calculateEntropyAt(x: number, y: number): number {
+        var possibleTiles: Array<number> = this.outputTiles[x+y*this.sprite.width];
+
+        var entropy = 0;
+        var W = this.indexed_sprite.length; //W is total weight
+
+        possibleTiles.forEach(w => {
+            entropy += w*Math.log2(w);
+        });
+
+        entropy = -1/W + Math.log2(W);
+        
+        return entropy;
+    }
     /*
     calculateEntropyAt(x: number, y: number) {
 
