@@ -16,6 +16,9 @@ export default class WFC {
     outputTiles: Array<Array<number>>; //holds all possible tiles for every pixel on output sprite
     //entropy_cache: Array<number>; //an array that stores the entropy of every cell
 
+
+    static dirs = [[1,0],[0,1],[-1,0],[0,-1]];
+
     constructor(sprite: Sprite, sliceWidth: number, sliceHeight: number, outputWidth: number, outputHeight: number) {
         this.sprite = sprite;
 
@@ -45,10 +48,10 @@ export default class WFC {
                 var curPixelIndex = this.getPixelIndexAtPosition(i,j);
 
                 //GENERATE frequency hits =-=-=-=-=-=-=-=-=
-                const dirs = [[1,0],[0,1],[-1,0],[0,-1]];
-                for (var d = 0; d < dirs.length; d++) {//for each valid direction
+                
+                for (var d = 0; d < WFC.dirs.length; d++) {//for each valid direction
 
-                    var dir = dirs[d];
+                    var dir = WFC.dirs[d];
 
                     var newPos = [ i+dir[0], j+dir[1] ];
 
@@ -130,15 +133,37 @@ export default class WFC {
     }
 
     collapse() {
-        //assume every single tile can appear anywhere at first
+        //populate cells with all possible tiles - assume every single tile can appear anywhere at first
         for (var i = 0; i < this.outputTiles.length; i++) {
             var possibleTiles = new Array<number>(this.tile_table.length);
             for (var p = 0; p < possibleTiles.length; p++) { possibleTiles[p] = p; }
             this.outputTiles[i] = possibleTiles;
         }
 
+        //compute entropies for all the cells
+
+
+
+        //choose cell to collapse based on lowest entropy (if theres a tie, break it)
+
+
+
+        //collapse the cell - remove all other possible tiles from the cell
+
+
+
+        //check enablers in every direction
+
+
+
+        //if a possible tile becomes invalid, remove it, recalculate entropies, and then repeat for all cells in every direction (besides one we came from)
+
+
+        
+        //once propogation stack is empty, choose new cell to collapse
     }
 
+    
     calculateEntropyAt(x: number, y: number): number {
         var possibleTiles: Array<number> = this.outputTiles[x+y*this.sprite.width];
 
@@ -146,56 +171,34 @@ export default class WFC {
         var W = this.indexed_sprite.length; //W is total weight
 
         possibleTiles.forEach(w => {
-            entropy += w*Math.log2(w);
+            entropy += w*WFC.logb2(w);
         });
 
-        entropy = -1/W + Math.log2(W);
+        entropy = -1/W + WFC.logb2(W);
         
         return entropy;
     }
-    /*
-    calculateEntropyAt(x: number, y: number) {
+    
+    //a tile is only valid if every single tile around it allows it to be there
+    public checkEnablers(x: number, y: number) {
 
-        //merge all surrounding cells adjacency data
+        for (var d = 0; d < WFC.dirs.length; d++) {
+            var dir = WFC.dirs[d];
 
-        var mergedAdjacenecy: Record<number,number> = {};
-        const dirs = [[1,0],[0,1],[-1,0],[0,-1]];
-        for (var d = 0; d < dirs.length; d++) {//for each valid direction
-
-            var dir = dirs[d];
             var newPos = [ x+dir[0], y+dir[1] ];
 
-            //only choose valid surrounding tiles
-            if (!this.sprite.wrapSprite && (newPos[0] < 0 || newPos[0] > this.outputWidth-1 || newPos[1] < 0 || newPos[1] > this.outputHeight-1)) {
+            if (newPos[0] < 0 || newPos[0] > this.outputWidth-1 || newPos[1] < 0 || newPos[1] > this.outputHeight-1) {
                 continue;
             }
 
-            //otherwise wrap is on, and we want to wrap back around
-            if (newPos[0] < 0) { newPos[0] += this.outputWidth; }
-            else if (newPos[0] > this.outputWidth-1) { newPos[0] -= this.outputWidth; }
-            if (newPos[1] < 0) { newPos[1] += this.outputHeight; }
-            else if (newPos[1] > this.outputHeight-1) { newPos[1] -= this.outputHeight; }
 
-            var newD = d+2; //flip the direction
-            if (newD > 3) { newD -= 4; }
-            if (newD < 0) { newD += 4}
-            var adj_data = this.adjacency[newPos[0]+newPos[1]*this.sprite.width][newD];  
-
-            Object.keys(adj_data).forEach(function(key) {
-
-                if (mergedAdjacenecy.hasOwnProperty(key)) { //if the merged data already exists
-                    mergedAdjacenecy[key] += adj_data[key];
-                } else {
-                    mergedAdjacenecy[key] = adj_data[key];
-                }
-            });
 
         }
-
-
-        return mergedAdjacenecy;
     }
-    */
 
 
+    static logb2(x : number): number {
+        return Math.log(x) / Math.log(2);
+    }
+    
 }

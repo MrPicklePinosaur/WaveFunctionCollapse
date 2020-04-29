@@ -88,10 +88,11 @@ var WFC = /** @class */ (function () {
     };
     WFC.prototype.computeFrequencyHints = function () {
         //this.frequency = new Array<number>(this.tile_table.length).fill(0);
-        var _this = this;
         //this.frequency = Array.from({length: this.tile_table.length}, (v,k) => 0);
+        var _this = this;
         this.frequency = new Array(this.tile_table.length);
-        for (var i = 0; i < this.frequency.length; i++) { //fill the array with 0, find an actual way to do this later
+        //fill the array with 0, find an actual way to do this later
+        for (var i = 0; i < this.frequency.length; i++) {
             this.frequency[i] = 0;
         }
         this.indexed_sprite.forEach(function (element) {
@@ -101,7 +102,11 @@ var WFC = /** @class */ (function () {
     WFC.prototype.collapse = function () {
         //assume every single tile can appear anywhere at first
         for (var i = 0; i < this.outputTiles.length; i++) {
-            this.outputTiles[i] = Array.from({ length: this.tile_table.length }, function (v, k) { return k; });
+            var possibleTiles = new Array(this.tile_table.length);
+            for (var p = 0; p < possibleTiles.length; p++) {
+                possibleTiles[p] = p;
+            }
+            this.outputTiles[i] = possibleTiles;
         }
     };
     WFC.prototype.calculateEntropyAt = function (x, y) {
@@ -109,10 +114,13 @@ var WFC = /** @class */ (function () {
         var entropy = 0;
         var W = this.indexed_sprite.length; //W is total weight
         possibleTiles.forEach(function (w) {
-            entropy += w * Math.log2(w);
+            entropy += w * WFC.logb2(w);
         });
-        entropy = -1 / W + Math.log2(W);
+        entropy = -1 / W + WFC.logb2(W);
         return entropy;
+    };
+    WFC.logb2 = function (x) {
+        return Math.log(x) / Math.log(2);
     };
     return WFC;
 }());
