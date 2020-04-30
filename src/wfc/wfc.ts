@@ -15,7 +15,7 @@ export default class WFC {
     adjacency: Array<Array<Record<number,number>>>; //of the form tile_index: [ direction: {adjacent_tileIndex: frequency_hits}]
     outputTiles: Array<Array<number>>; //holds all possible tiles for every pixel on output sprite
     //entropy_cache: Array<number>; //an array that stores the entropy of every cell
-
+    entropy_cache: Array<[number,number]>; //in the form entropy: tile index
 
     static dirs = [[1,0],[0,1],[-1,0],[0,-1]];
 
@@ -31,9 +31,8 @@ export default class WFC {
         this.adjacency = [];
 
         this.outputTiles = new Array<Array<number>>(this.outputWidth*this.outputHeight);
-
-
         //this.entropy_cache = new Array<number>(this.outputWidth*this.outputHeight);
+        this.entropy_cache = [];
     }
     
 
@@ -138,10 +137,12 @@ export default class WFC {
             var possibleTiles = new Array<number>(this.tile_table.length);
             for (var p = 0; p < possibleTiles.length; p++) { possibleTiles[p] = p; }
             this.outputTiles[i] = possibleTiles;
+            //compute entropies for all the cells
+            var H = this.calculateEntropyAt(i);
+            this.sortedEntropyInsert(H,i);
+
         }
-
-        //compute entropies for all the cells
-
+        //console.log(this.entropy_cache);
 
 
         //choose cell to collapse based on lowest entropy (if theres a tie, break it)
@@ -164,8 +165,8 @@ export default class WFC {
     }
 
     
-    calculateEntropyAt(x: number, y: number): number {
-        var possibleTiles: Array<number> = this.outputTiles[x+y*this.sprite.width];
+    calculateEntropyAt(i: number): number {
+        var possibleTiles: Array<number> = this.outputTiles[i];
 
         var entropy = 0;
         var W = this.indexed_sprite.length; //W is total weight
@@ -175,6 +176,9 @@ export default class WFC {
         });
 
         entropy = -1/W + WFC.logb2(W);
+
+        //add a tiny amount of noise to break any ties
+        entropy += Math.random()/1000000;
         
         return entropy;
     }
@@ -197,8 +201,22 @@ export default class WFC {
     }
 
 
+    sortedEntropyInsert(entropy: number, tile_index: number) { //sorted insert into entropy cache
+        
+        for (var i = 0; i < this.entropy_cache.length; i++) {
+            var curEntropy = this.entropy_cache[i][0];
+            if (entropy > curEntropy) {
+                //insert after 
+                this.entropy_cache.splice(i,0,[entropy,tile_index]);
+                return;
+            }
+        }
+        this.entropy_cache.push([entropy,tile_index]);
+    }
     static logb2(x : number): number {
         return Math.log(x) / Math.log(2);
     }
+
+    
     
 }

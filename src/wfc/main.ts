@@ -62,7 +62,6 @@ wfc_form.addEventListener('submit', (evt) => {
     wfc.imageProcessor();
     wfc.computeFrequencyHints();
     wfc.collapse();
-    console.log(wfc.calculateEntropyAt(0,0));
 
     
     //sample each point on sprite and draw it

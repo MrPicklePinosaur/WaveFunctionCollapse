@@ -2,7 +2,6 @@
 exports.__esModule = true;
 var sprite_js_1 = require("./sprite.js");
 var WFC = /** @class */ (function () {
-    //entropy_cache: Array<number>; //an array that stores the entropy of every cell
     function WFC(sprite, sliceWidth, sliceHeight, outputWidth, outputHeight) {
         this.sprite = sprite;
         this.sliceWidth = sliceWidth;
@@ -13,6 +12,7 @@ var WFC = /** @class */ (function () {
         this.adjacency = [];
         this.outputTiles = new Array(this.outputWidth * this.outputHeight);
         //this.entropy_cache = new Array<number>(this.outputWidth*this.outputHeight);
+        this.entropy_cache = [];
     }
     //gets all enumerations of the main sprite and indexes each subsprite as well as generating adjacncy rules for each subsprite
     WFC.prototype.imageProcessor = function () {
@@ -21,9 +21,8 @@ var WFC = /** @class */ (function () {
             for (var i = 0; i < this.sprite.width; i++) {
                 var curPixelIndex = this.getPixelIndexAtPosition(i, j);
                 //GENERATE frequency hits =-=-=-=-=-=-=-=-=
-                var dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]];
-                for (var d = 0; d < dirs.length; d++) { //for each valid direction
-                    var dir = dirs[d];
+                for (var d = 0; d < WFC.dirs.length; d++) { //for each valid direction
+                    var dir = WFC.dirs[d];
                     var newPos = [i + dir[0], j + dir[1]];
                     //wrap back around
                     if (newPos[0] < 0) {
@@ -100,28 +99,61 @@ var WFC = /** @class */ (function () {
         });
     };
     WFC.prototype.collapse = function () {
-        //assume every single tile can appear anywhere at first
+        //populate cells with all possible tiles - assume every single tile can appear anywhere at first
         for (var i = 0; i < this.outputTiles.length; i++) {
             var possibleTiles = new Array(this.tile_table.length);
             for (var p = 0; p < possibleTiles.length; p++) {
                 possibleTiles[p] = p;
             }
             this.outputTiles[i] = possibleTiles;
+            //compute entropies for all the cells
+            var H = this.calculateEntropyAt(i);
+            this.sortedEntropyInsert(H, i);
         }
+        console.log(this.entropy_cache);
+        //choose cell to collapse based on lowest entropy (if theres a tie, break it)
+        //collapse the cell - remove all other possible tiles from the cell
+        //check enablers in every direction
+        //if a possible tile becomes invalid, remove it, recalculate entropies, and then repeat for all cells in every direction (besides one we came from)
+        //once propogation stack is empty, choose new cell to collapse
     };
-    WFC.prototype.calculateEntropyAt = function (x, y) {
-        var possibleTiles = this.outputTiles[x + y * this.sprite.width];
+    WFC.prototype.calculateEntropyAt = function (i) {
+        var possibleTiles = this.outputTiles[i];
         var entropy = 0;
         var W = this.indexed_sprite.length; //W is total weight
         possibleTiles.forEach(function (w) {
             entropy += w * WFC.logb2(w);
         });
         entropy = -1 / W + WFC.logb2(W);
+        //add a tiny amount of noise to break any ties
+        entropy += Math.random() / 1000000;
         return entropy;
+    };
+    //a tile is only valid if every single tile around it allows it to be there
+    WFC.prototype.checkEnablers = function (x, y) {
+        for (var d = 0; d < WFC.dirs.length; d++) {
+            var dir = WFC.dirs[d];
+            var newPos = [x + dir[0], y + dir[1]];
+            if (newPos[0] < 0 || newPos[0] > this.outputWidth - 1 || newPos[1] < 0 || newPos[1] > this.outputHeight - 1) {
+                continue;
+            }
+        }
+    };
+    WFC.prototype.sortedEntropyInsert = function (entropy, tile_index) {
+        for (var i = 0; i < this.entropy_cache.length; i++) {
+            var curEntropy = this.entropy_cache[i][0];
+            if (entropy > curEntropy) {
+                //insert after 
+                this.entropy_cache.splice(i, 0, [entropy, tile_index]);
+                return;
+            }
+        }
+        this.entropy_cache.push([entropy, tile_index]);
     };
     WFC.logb2 = function (x) {
         return Math.log(x) / Math.log(2);
     };
+    WFC.dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]];
     return WFC;
 }());
 exports["default"] = WFC;
