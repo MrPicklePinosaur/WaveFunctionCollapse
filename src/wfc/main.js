@@ -55,6 +55,9 @@ wfc_form.addEventListener('submit', function (evt) {
     sliced_canvas.innerHTML = ''; //clear all child nodes
     for (var i = 0; i < wfc.tile_table.length; i++) {
         //console.log(wfc.adjacency[i]);
+        var occurence = document.createElement('p');
+        occurence.textContent = String(wfc.frequency[i]);
+        sliced_canvas.appendChild(occurence);
         var new_canvas = document.createElement('canvas');
         new_canvas.id = 'sliced-sprite';
         drawSprite(new sprite_js_1["default"](sliceWidth, sliceHeight, wfc.tile_table[i]), new_canvas, 20);

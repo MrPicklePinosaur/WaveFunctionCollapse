@@ -118,6 +118,7 @@ export default class WFC {
         return this.indexed_sprite[pos];
     }
 
+    //MAYBE, instead of using the input image tile occurences, use occurences in adjacency rules    
     computeFrequencyHints() { //calculates the frequency each tile appears in the input sprite
         //this.frequency = new Array<number>(this.tile_table.length).fill(0);
         //this.frequency = Array.from({length: this.tile_table.length}, (v,k) => 0);
@@ -131,6 +132,7 @@ export default class WFC {
         });
     }
 
+
     collapse() {
         //populate cells with all possible tiles - assume every single tile can appear anywhere at first
         for (var i = 0; i < this.outputTiles.length; i++) {
@@ -142,15 +144,14 @@ export default class WFC {
             this.sortedEntropyInsert(H,i);
 
         }
-        //console.log(this.entropy_cache);
 
-
-        //choose cell to collapse based on lowest entropy (if theres a tie, break it)
-
-
-
+        //choose cell to collapse based on lowest entropy
+        var collapse_index = this.entropy_cache.shift()[1];
+        
         //collapse the cell - remove all other possible tiles from the cell
-
+        var tiles = this.outputTiles[collapse_index];
+        console.log(`possible tiles: ${tiles}`);
+        console.log(this.chooseTile(tiles));
 
 
         //check enablers in every direction
@@ -200,6 +201,22 @@ export default class WFC {
         }
     }
 
+    chooseTile(tiles: Array<number>): Array<number> { //chooses a tile to collapse to based on frequency hints
+        var possibilityStrip = [];
+        //generate strip of tiles (for weighted choice)
+        tiles.forEach(t => {
+            var freq = this.frequency[t];
+            var newStripSegment = new Array(freq);
+            WFC.fillArray(newStripSegment,t);
+            possibilityStrip = [...possibilityStrip,...newStripSegment];
+        });
+
+        //choose random tile on strip
+        var ind = Math.floor(Math.random()*possibilityStrip.length);
+
+        return possibilityStrip[ind];
+
+    }
 
     sortedEntropyInsert(entropy: number, tile_index: number) { //sorted insert into entropy cache
         
@@ -215,6 +232,12 @@ export default class WFC {
     }
     static logb2(x : number): number {
         return Math.log(x) / Math.log(2);
+    }
+
+    static fillArray(array: Array<number>, value: number): void {
+        for (var i = 0; i < array.length; i++) {
+            array[i] = value;
+        }
     }
 
     

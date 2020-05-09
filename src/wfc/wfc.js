@@ -1,4 +1,11 @@
 "use strict";
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 exports.__esModule = true;
 var sprite_js_1 = require("./sprite.js");
 var WFC = /** @class */ (function () {
@@ -85,6 +92,7 @@ var WFC = /** @class */ (function () {
         //if it has already been indexed, just return the index/id of the tile
         return this.indexed_sprite[pos];
     };
+    //MAYBE, instead of using the input image tile occurences, use occurences in adjacency rules    
     WFC.prototype.computeFrequencyHints = function () {
         //this.frequency = new Array<number>(this.tile_table.length).fill(0);
         //this.frequency = Array.from({length: this.tile_table.length}, (v,k) => 0);
@@ -110,9 +118,12 @@ var WFC = /** @class */ (function () {
             var H = this.calculateEntropyAt(i);
             this.sortedEntropyInsert(H, i);
         }
-        console.log(this.entropy_cache);
-        //choose cell to collapse based on lowest entropy (if theres a tie, break it)
+        //choose cell to collapse based on lowest entropy
+        var collapse_index = this.entropy_cache.shift()[1];
         //collapse the cell - remove all other possible tiles from the cell
+        var tiles = this.outputTiles[collapse_index];
+        console.log("possible tiles: " + tiles);
+        console.log(this.chooseTile(tiles));
         //check enablers in every direction
         //if a possible tile becomes invalid, remove it, recalculate entropies, and then repeat for all cells in every direction (besides one we came from)
         //once propogation stack is empty, choose new cell to collapse
@@ -139,6 +150,20 @@ var WFC = /** @class */ (function () {
             }
         }
     };
+    WFC.prototype.chooseTile = function (tiles) {
+        var _this = this;
+        var possibilityStrip = [];
+        //generate strip of tiles (for weighted choice)
+        tiles.forEach(function (t) {
+            var freq = _this.frequency[t];
+            var newStripSegment = new Array(freq);
+            WFC.fillArray(newStripSegment, t);
+            possibilityStrip = __spreadArrays(possibilityStrip, newStripSegment);
+        });
+        //choose random tile on strip
+        var ind = Math.floor(Math.random() * possibilityStrip.length);
+        return possibilityStrip[ind];
+    };
     WFC.prototype.sortedEntropyInsert = function (entropy, tile_index) {
         for (var i = 0; i < this.entropy_cache.length; i++) {
             var curEntropy = this.entropy_cache[i][0];
@@ -152,6 +177,11 @@ var WFC = /** @class */ (function () {
     };
     WFC.logb2 = function (x) {
         return Math.log(x) / Math.log(2);
+    };
+    WFC.fillArray = function (array, value) {
+        for (var i = 0; i < array.length; i++) {
+            array[i] = value;
+        }
     };
     WFC.dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]];
     return WFC;
