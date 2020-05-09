@@ -205,15 +205,25 @@ export default class WFC {
     
     //a tile is only valid if every single tile around it allows it to be there
     public checkEnablers(x: number, y: number) {
+        var curTiles = this.outputTiles[x+y*this.outputWidth];
 
         for (var d = 0; d < WFC.dirs.length; d++) {
             var dir = WFC.dirs[d];
 
             var newPos = [ x+dir[0], y+dir[1] ];
+            var oppD = d+2 > 3 ? d-2 : d+2;
 
             if (newPos[0] < 0 || newPos[0] > this.outputWidth-1 || newPos[1] < 0 || newPos[1] > this.outputHeight-1) {
                 continue;
             }
+
+            var ind = newPos[0]+newPos[1]*this.outputWidth;
+            var adjRules = this.adjacency[ind][oppD];
+
+            //check to see if adjaceny rules allow for tiles in current position
+            curTiles.forEach(t => {
+                
+            });
 
 
 
@@ -249,6 +259,9 @@ export default class WFC {
         }
         this.entropy_cache.push([entropy,tile_index]);
     }
+
+
+    //helpers
     static logb2(x : number): number {
         return Math.log(x) / Math.log(2);
     }
