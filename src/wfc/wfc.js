@@ -107,6 +107,7 @@ var WFC = /** @class */ (function () {
         });
     };
     WFC.prototype.collapse = function () {
+        var _this = this;
         //populate cells with all possible tiles - assume every single tile can appear anywhere at first
         for (var i = 0; i < this.outputTiles.length; i++) {
             var possibleTiles = new Array(this.tile_table.length);
@@ -122,11 +123,39 @@ var WFC = /** @class */ (function () {
         var collapse_index = this.entropy_cache.shift()[1];
         //collapse the cell - remove all other possible tiles from the cell
         var tiles = this.outputTiles[collapse_index];
-        console.log("possible tiles: " + tiles);
-        console.log(this.chooseTile(tiles));
-        //check enablers in every direction
-        //if a possible tile becomes invalid, remove it, recalculate entropies, and then repeat for all cells in every direction (besides one we came from)
-        //once propogation stack is empty, choose new cell to collapse
+        this.outputTiles = [this.chooseTile(tiles)];
+        //start propogation
+        var propStack = []; //array of tile indicies
+        //prepopulate
+        collapse_index = 0;
+        var ind_offsets = [-1, 1, -this.outputWidth, this.outputHeight];
+        ind_offsets.forEach(function (o) {
+            var new_ind = collapse_index + o;
+            //if within bounds
+            if (!(new_ind < 0 || new_ind > _this.outputWidth * _this.outputHeight - 1)) {
+                propStack.push(new_ind);
+            }
+        });
+        console.log("stack: " + propStack);
+        /*
+        WFC.dirs.forEach(d => {
+            var new_pos = [collapse_pos[0]+d[0],collapse_pos[1]+d[1]];
+
+            if (!(new_pos[0] < 0 || new_pos[0] > this.outputWidth-1 || new_pos[1] < 0 || new_pos[1] > this.outputHeight-1)) {
+                propStack
+            }
+        });
+        */
+        /*
+        while (propStack.length > 0) {
+
+            //check enablers in every direction
+
+            //if a possible tile becomes invalid, remove it, recalculate entropies, and then repeat for all cells in every direction (besides one we came from)
+
+            //once propogation stack is empty, choose new cell to collapse
+        }
+        */
     };
     WFC.prototype.calculateEntropyAt = function (i) {
         var possibleTiles = this.outputTiles[i];

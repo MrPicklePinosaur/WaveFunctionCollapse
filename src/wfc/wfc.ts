@@ -150,19 +150,38 @@ export default class WFC {
         
         //collapse the cell - remove all other possible tiles from the cell
         var tiles = this.outputTiles[collapse_index];
-        console.log(`possible tiles: ${tiles}`);
-        console.log(this.chooseTile(tiles));
+        this.outputTiles = [this.chooseTile(tiles)];
 
 
-        //check enablers in every direction
+        //start propogation
+        var propStack: Array<number> = []; //array of tile indicies
 
-
-
-        //if a possible tile becomes invalid, remove it, recalculate entropies, and then repeat for all cells in every direction (besides one we came from)
-
+        //prepopulate
+        var ind_offsets = [-1,1,-this.outputWidth,this.outputHeight];
+        ind_offsets.forEach(o => {
+            var new_ind = collapse_index+o;
+            //if within bounds
+            if (!(new_ind < 0 || new_ind > this.outputWidth*this.outputHeight-1)) {
+                propStack.push(new_ind);
+            }
+        });
 
         
-        //once propogation stack is empty, choose new cell to collapse
+        while (propStack.length > 0) {
+            var curInd = propStack.unshift();
+
+            //check enablers in every direction
+
+            //if a possible tile becomes invalid, remove it, recalculate entropies, and then repeat for all cells in every direction (besides one we came from)
+
+            //once propogation stack is empty, choose new cell to collapse
+        }
+        
+
+        //NOTES: instead of operating by x,y coordinates, consider using indicies instead, write a function that finds valid indicies in all four directions
+
+
+
     }
 
     
