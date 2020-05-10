@@ -66,12 +66,21 @@ export default class ImageProcessor {
             var curTile = this.indexedSprite[i];
 
             //look in every direction and compute enablers
+            var newInds = ImageProcessor.getIndiciesAround(i,this.inputWidth,this.inputHeight,true); //REPLACE THIS LATER
+            
+            Object.keys(newInds).forEach(dir => {
+                var newInd = newInds[dir];
 
-                //insert function that returns index in all valid directions
-
-            //each tile is going to store it's enablers, instead of the tiles it enables
+                //each tile is going to store it's enablers, instead of the tiles it enables
+                var newTileIndex = this.indexedSprite[newInd];
+                if (!adjacency[i][dir].contains(newTileIndex)) {
+                    adjacency[i][dir].push(newTileIndex);
+                }
+            }); 
 
         }
+
+        return adjacency;
 
     }
 
@@ -90,33 +99,73 @@ export default class ImageProcessor {
 
     }
 
+    //helpers
+    getSubSprite(index: number, width: number, height: number, wrapping: boolean): string[] {
+        var subSprite = new Array<string>();
+
+        var curIndex = index;
+        for (var j = 0; j < height; j++) {
+
+            for (var i = 0; i < width; i++) {
+
+                curIndex += 1; //shift to the right
+
+                //if (curIndex )
+
+            }
+
+            curIndex += width; //go down a layer
+
+            if (wrapping) {
+
+            }
+        }
+
+        return subSprite;
+    }
+
+
     //looks in four directions and returns valid indicies
     static getIndiciesAround(index: number, width: number, height: number, wrapping: boolean): Record<Direction,number> { 
 
         var output: Record<Direction,number>;
 
-        var right = index+1;
-        var left = index-1;
-        var down = index+width;
-        var up = index-width;
-
-        if (wrapping) {
-
-            output["RIGHT"] = (right < width) ? right : right-width;
-            output["LEFT"] = (left >= 0) ? left : left+width;
-            output["DOWN"] = (down < width*height) ? down : down-width*height;
-            output["UP"] = (up >= 0) ? up : up+width*height;
-
-        } else {
-
-            if (right < width) { output["RIGHT"] = right; }
-            if (left >= 0) { output["LEFT"] = left; }
-            if (down < width*height) { output["DOWN"] = down; }
-            if (up >= 0) { output["UP"] = up; }
-
-        }
+        ["RIGHT","LEFT","DOWN","UP"].forEach(d => {
+            var ind = ImageProcessor.getIndexInDirection(index,width,height,<Direction> d,wrapping);
+            if (ind != -1) { output[d] = ind; };
+        });
 
         return output;
+    }
+
+    static getIndexInDirection(index: number, width: number, height: number, direction: Direction, wrapping: boolean): number {
+
+        var outOfBoundsReturnValue = -1; //what to return if tile we are trying to access goes of the sprite
+
+        if (direction === "RIGHT") {
+
+            if (wrapping) { outOfBoundsReturnValue = index+1-width; } 
+            return (index%width)+1 < width ? index+1 : outOfBoundsReturnValue;
+
+        } else if (direction === "LEFT") {
+
+            if (wrapping) { outOfBoundsReturnValue = index-1+width; }
+            return (index%width)-1 >= 0 ? index-1 : outOfBoundsReturnValue;
+
+        } else if (direction === "DOWN") {
+
+            if (wrapping) { outOfBoundsReturnValue = index+width-width*height; }
+            return (index+width < width*height) ? index+width : outOfBoundsReturnValue;
+
+        } else if (direction === "UP") {
+
+            if (wrapping) { outOfBoundsReturnValue = index-width+width*height}
+            return (index-width >= 0) ? index-width : outOfBoundsReturnValue;
+        }
+
+        return -1;
+         
+
     }
 
 
