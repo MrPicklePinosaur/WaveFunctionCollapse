@@ -48,20 +48,12 @@ wfc_form.addEventListener('submit', function (evt) {
     //generate everything
     var ip = new ImageProcessor_js_1["default"](pixels, inputWidth, inputHeight, sliceWidth, sliceHeight);
     drawSprite(pixels, inputWidth, inputHeight, main_canvas, 20);
-    /*
     //sample each point on sprite and draw it
     sliced_canvas.innerHTML = ''; //clear all child nodes
-    for (var i = 0; i < wfc.tile_table.length; i++) {
-
-        //console.log(wfc.adjacency[i]);
-        var occurence = document.createElement('p');
-        occurence.textContent = String(wfc.frequency[i]);
-        sliced_canvas.appendChild(occurence);
-
+    for (var i = 0; i < ip.index_table.length; i++) {
         var new_canvas = document.createElement('canvas');
         new_canvas.id = 'sliced-sprite';
-        drawSprite(new Sprite(sliceWidth, sliceHeight,wfc.tile_table[i]),new_canvas,20);
+        drawSprite(ip.index_table[i], sliceWidth, sliceHeight, new_canvas, 20);
         sliced_canvas.appendChild(new_canvas);
     }
-    */
 });

@@ -7,6 +7,10 @@
 exports.__esModule = true;
 var ImageProcessor = /** @class */ (function () {
     function ImageProcessor(pixels, width, height, sliceWidth, sliceHeight) {
+        //include options like wrapping
+        //outputs
+        this.indexedSprite = new Array();
+        this.index_table = new Array(); //index in array corresponds to tile index
         this.inputSprite = pixels;
         this.inputWidth = width;
         this.inputHeight = height;
@@ -19,8 +23,12 @@ var ImageProcessor = /** @class */ (function () {
             //get a subsprite
             var subSprite = this.getSubSprite(i, true);
             //check to see if it is already in the index table
-            //if no, add new entry to index_table
-            //update indexedSprite
+            var ind = ImageProcessor.findNestedArray(this.index_table, subSprite);
+            if (ind == -1) { //if no, add new entry to index_table
+                this.index_table.push(subSprite);
+                ind = this.index_table.length - 1;
+            }
+            this.indexedSprite[i] = ind; //update indexedSprite
         }
     };
     ImageProcessor.prototype.calculateAdjacencyRules = function () {
@@ -29,23 +37,27 @@ var ImageProcessor = /** @class */ (function () {
                 array contains all tiles this tile enables in that direction
         */
         var _this = this;
-        var adjacency = new Array(this.index_table.length);
-        ImageProcessor.fillArray(adjacency, {
-            "RIGHT": new Array(),
-            "LEFT": new Array(),
-            "DOWN": new Array(),
-            "UP": new Array()
-        });
+        //var adjacency = new Array<Record<Direction,Array<number>>>(this.index_table.length);
+        var adjacency = [];
+        for (var i = 0; i < this.index_table.length; i++) {
+            adjacency.push({
+                "RIGHT": new Array(0),
+                "LEFT": new Array(0),
+                "DOWN": new Array(0),
+                "UP": new Array(0)
+            });
+        }
         for (var i = 0; i < this.indexedSprite.length; i++) {
             var curTile = this.indexedSprite[i];
             //look in every direction and compute enablers
             var newInds = ImageProcessor.getIndiciesAround(i, this.inputWidth, this.inputHeight, true); //REPLACE THIS LATER
+            //console.log(newInds);
             Object.keys(newInds).forEach(function (dir) {
                 var newInd = newInds[dir];
                 //each tile is going to store it's enablers, instead of the tiles it enables
                 var newTileIndex = _this.indexedSprite[newInd];
-                if (!adjacency[i][dir].contains(newTileIndex)) {
-                    adjacency[i][dir].push(newTileIndex);
+                if (adjacency[curTile][dir].indexOf(newTileIndex) == -1) {
+                    adjacency[curTile][dir].push(newTileIndex);
                 }
             });
         }
@@ -126,9 +138,29 @@ var ImageProcessor = /** @class */ (function () {
         return -1;
     };
     ImageProcessor.fillArray = function (array, value) {
-        for (var i = 0; i < array.length; i++) {
+        for (var i = 0; i < length; i++) {
             array[i] = value;
         }
+    };
+    ImageProcessor.compareArray = function (a, b) {
+        if (a.length != b.length) {
+            return false;
+        }
+        for (var i = 0; i < a.length; i++) {
+            if (a[i] != b[i]) {
+                return false;
+            }
+        }
+        return true;
+    };
+    //finds index of array inside parent array
+    ImageProcessor.findNestedArray = function (parent, target) {
+        for (var i = 0; i < parent.length; i++) {
+            if (ImageProcessor.compareArray(target, parent[i])) {
+                return i;
+            }
+        }
+        return -1;
     };
     return ImageProcessor;
 }());

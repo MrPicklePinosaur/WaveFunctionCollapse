@@ -19,8 +19,8 @@ export default class ImageProcessor {
 
 
     //outputs
-    indexedSprite: number[]; 
-    index_table: Array<string[]>; //index in array corresponds to tile index
+    indexedSprite: number[] = new Array<number>(); 
+    index_table: Array<string[]> = new Array<string[]>(); //index in array corresponds to tile index
 
     constructor(pixels: string[], width: number, height: number, sliceWidth: number, sliceHeight: number) {
         this.inputSprite = pixels;
@@ -40,12 +40,17 @@ export default class ImageProcessor {
             var subSprite = this.getSubSprite(i,true);
 
             //check to see if it is already in the index table
+            var ind = ImageProcessor.findNestedArray(this.index_table,subSprite);
 
-                //if no, add new entry to index_table
+            if (ind == -1) { //if no, add new entry to index_table
+                this.index_table.push(subSprite);
+                ind = this.index_table.length-1;
+            }
 
-            //update indexedSprite
+            this.indexedSprite[i] = ind; //update indexedSprite
 
         }
+
     }
 
     calculateAdjacencyRules() {
@@ -55,28 +60,36 @@ export default class ImageProcessor {
                 array contains all tiles this tile enables in that direction
         */
 
-        var adjacency = new Array<Record<Direction,Array<number>>>(this.index_table.length);
-        ImageProcessor.fillArray(adjacency,{
-            "RIGHT": new Array<number>(),
-            "LEFT": new Array<number>(),
-            "DOWN": new Array<number>(),
-            "UP": new Array<number>()
-        });
-
+        //var adjacency = new Array<Record<Direction,Array<number>>>(this.index_table.length);
+        var adjacency = [];
+        for (var i = 0; i < this.index_table.length; i++) {
+            adjacency.push({
+                "RIGHT": new Array<number>(0),
+                "LEFT": new Array<number>(0),
+                "DOWN": new Array<number>(0),
+                "UP": new Array<number>(0)
+            });
+        }
+        
         for (var i = 0; i < this.indexedSprite.length; i++) {
             var curTile = this.indexedSprite[i];
 
             //look in every direction and compute enablers
             var newInds = ImageProcessor.getIndiciesAround(i,this.inputWidth,this.inputHeight,true); //REPLACE THIS LATER
-            
+            //console.log(newInds);
             Object.keys(newInds).forEach(dir => {
+                
+
                 var newInd = newInds[dir];
 
                 //each tile is going to store it's enablers, instead of the tiles it enables
                 var newTileIndex = this.indexedSprite[newInd];
-                if (!adjacency[i][dir].contains(newTileIndex)) {
-                    adjacency[i][dir].push(newTileIndex);
+
+                if (adjacency[curTile][<Direction>dir].indexOf(newTileIndex) == -1) {
+                    adjacency[curTile][<Direction>dir].push(newTileIndex);
                 }
+                
+                
             }); 
 
         }
@@ -175,11 +188,28 @@ export default class ImageProcessor {
     }
 
     static fillArray<T>(array: Array<T>, value: T) {
-
-        for (var i = 0; i < array.length; i++) {
+        for (var i = 0; i < length; i++) {
             array[i] = value;
         }
-
     }
 
+    static compareArray<T>(a: Array<T>, b: Array<T>): boolean { //comapres contents of array
+        if (a.length != b.length) { return false; }
+
+        for (var i = 0; i < a.length; i++) {
+            if (a[i] != b[i]) { return false; }
+        }
+
+        return true;
+    }
+
+    //finds index of array inside parent array
+    static findNestedArray<T>(parent: Array<Array<T>>, target: Array<T>): number {
+
+        for (var i = 0; i < parent.length; i++) {
+            if (ImageProcessor.compareArray(target,parent[i])) { return i; }
+        }
+
+        return -1;
+    }
 }
