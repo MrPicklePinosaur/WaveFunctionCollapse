@@ -37,6 +37,7 @@ export default class ImageProcessor {
         for (var i = 0; i < this.inputSprite.length; i++) {
 
             //get a subsprite
+            var subSprite = this.getSubSprite(i,true);
 
             //check to see if it is already in the index table
 
@@ -55,7 +56,7 @@ export default class ImageProcessor {
         */
 
         var adjacency = new Array<Record<Direction,Array<number>>>(this.index_table.length);
-        adjacency.fill({
+        ImageProcessor.fillArray(adjacency,{
             "RIGHT": new Array<number>(),
             "LEFT": new Array<number>(),
             "DOWN": new Array<number>(),
@@ -86,7 +87,8 @@ export default class ImageProcessor {
 
     calculateFrequencyHints(): Array<number> {
         //format: index of array is tile index, array stores occurences of each tile
-        var frequency = new Array<number>(this.index_table.length).fill(0); //todo fix the fill function
+        var frequency = new Array<number>(this.index_table.length);
+        ImageProcessor.fillArray(frequency,0);
 
         this.indexedSprite.forEach(t => {
 
@@ -100,25 +102,28 @@ export default class ImageProcessor {
     }
 
     //helpers
-    getSubSprite(index: number, width: number, height: number, wrapping: boolean): string[] {
+    getSubSprite(index: number, wrapping: boolean): Array<string> {
         var subSprite = new Array<string>();
 
         var curIndex = index;
-        for (var j = 0; j < height; j++) {
+        for (var j = 0; j < this.sliceHeight; j++) {
 
-            for (var i = 0; i < width; i++) {
+            subSprite.push(this.inputSprite[curIndex]);
 
-                curIndex += 1; //shift to the right
+            for (var i = 0; i < this.sliceWidth; i++) {
 
-                //if (curIndex )
+                //shift to the right
+                curIndex = ImageProcessor.getIndexInDirection(index,this.sliceWidth,this.sliceHeight,"RIGHT",wrapping);
+                if (curIndex == -1) { console.error("Invalid Subsprite"); }
 
-            }
-
-            curIndex += width; //go down a layer
-
-            if (wrapping) {
+                subSprite.push(this.inputSprite[curIndex]);
 
             }
+
+            //go down a layer
+            curIndex = ImageProcessor.getIndexInDirection(index,this.sliceWidth,this.sliceHeight,"RIGHT",wrapping);
+            if (curIndex == -1) { console.error("Invalid Subsprite"); }
+
         }
 
         return subSprite;
@@ -161,13 +166,19 @@ export default class ImageProcessor {
 
             if (wrapping) { outOfBoundsReturnValue = index-width+width*height}
             return (index-width >= 0) ? index-width : outOfBoundsReturnValue;
+            
         }
 
         return -1;
-         
 
     }
 
+    static fillArray<T>(array: Array<T>, value: T) {
 
+        for (var i = 0; i < array.length; i++) {
+            array[i] = value;
+        }
+
+    }
 
 }

@@ -1,15 +1,15 @@
 
-import Sprite from "./sprite.js";
-import WFC from "./wfc.js";
+//import ImageProcessor from "src/new/ImageProcessor.js";
+import ImageProcessor from "../new/ImageProcessor.js";
 
-function drawSprite(sprite: Sprite, canvas: any, scale: number) {
-    canvas.width = sprite.width * scale;
-    canvas.height = sprite.height * scale;
+function drawSprite(pixels: string[], width: number, height: number, canvas: any, scale: number) {
+    canvas.width = width * scale;
+    canvas.height = height * scale;
     let cx = canvas.getContext('2d');
 
-    for (var y = 0; y < sprite.height; y++) {
-        for (var x = 0; x < sprite.width; x++) {
-            cx.fillStyle = sprite.getPixel(x,y);
+    for (var y = 0, i = 0; y < height; y++) {
+        for (var x = 0; x < width; x++, i++) {
+            cx.fillStyle = pixels[i];
             cx.fillRect(x*scale,y*scale,scale,scale);
         }
     }
@@ -36,6 +36,8 @@ var pixels = [
     bluish, bluish, bluish, bluish, bluish,
     black, bluish, black, black, black,
 ];
+var inputWidth = 5;
+var inputHeight = 5;
 
 const main_canvas = document.getElementById('main-canvas');
 const sliced_canvas = document.getElementById('sliced-canvas');
@@ -50,20 +52,13 @@ wfc_form.addEventListener('submit', (evt) => {
 
     var sliceWidth: number = +(data.get('slice-width') as string); //convert to number
     var sliceHeight: number = +(data.get('slice-height') as string);
-    //console.log({sliceWidth, sliceHeight, spriteWrap});
 
     //generate everything
-    var s = new Sprite(5,5,pixels)
-    var wfc = new WFC(s,sliceWidth,sliceHeight,20,20);
+    var ip = new ImageProcessor(pixels,inputWidth,inputHeight,sliceWidth,sliceHeight);
 
-    drawSprite(s,main_canvas,20);
+    drawSprite(pixels,inputWidth,inputHeight,main_canvas,20);
 
-
-    wfc.imageProcessor();
-    wfc.computeFrequencyHints();
-    wfc.collapse();
-
-    
+    /*
     //sample each point on sprite and draw it
     sliced_canvas.innerHTML = ''; //clear all child nodes
     for (var i = 0; i < wfc.tile_table.length; i++) {
@@ -77,11 +72,6 @@ wfc_form.addEventListener('submit', (evt) => {
         new_canvas.id = 'sliced-sprite';
         drawSprite(new Sprite(sliceWidth, sliceHeight,wfc.tile_table[i]),new_canvas,20);
         sliced_canvas.appendChild(new_canvas);
-
-
-    
-}
+    }
+    */
 });
-
-
-
