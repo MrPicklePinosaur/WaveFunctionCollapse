@@ -26,8 +26,8 @@ export default class ImageProcessor {
         this.inputSprite = pixels;
         this.inputWidth = width;
         this.inputHeight = height;
-        this.sliceWidth = width;
-        this.sliceHeight = height;
+        this.sliceWidth = sliceWidth;
+        this.sliceHeight = sliceHeight;
 
         this.indexInputImage();
     }
@@ -108,22 +108,23 @@ export default class ImageProcessor {
         var curIndex = index;
         for (var j = 0; j < this.sliceHeight; j++) {
 
-            subSprite.push(this.inputSprite[curIndex]);
+            var rowInd = curIndex; //save the position of the beginning of the row
 
             for (var i = 0; i < this.sliceWidth; i++) {
 
-                //shift to the right
-                curIndex = ImageProcessor.getIndexInDirection(index,this.sliceWidth,this.sliceHeight,"RIGHT",wrapping);
-                if (curIndex == -1) { console.error("Invalid Subsprite"); }
-
                 subSprite.push(this.inputSprite[curIndex]);
+
+                //shift to the right
+                curIndex = ImageProcessor.getIndexInDirection(curIndex,this.inputWidth,this.inputHeight,"RIGHT",wrapping);
+                if (curIndex == -1) { console.error("Invalid Subsprite"); }
 
             }
 
-            //go down a layer
-            curIndex = ImageProcessor.getIndexInDirection(index,this.sliceWidth,this.sliceHeight,"RIGHT",wrapping);
-            if (curIndex == -1) { console.error("Invalid Subsprite"); }
-
+            if (j < this.sliceHeight-1) { //dont go down of the final pass (bad solution for now)
+                //go down a layer
+                curIndex = ImageProcessor.getIndexInDirection(rowInd,this.inputWidth,this.inputHeight,"DOWN",wrapping);
+                if (curIndex == -1) { console.error("Invalid Subsprite"); }
+            }
         }
 
         return subSprite;
@@ -131,9 +132,9 @@ export default class ImageProcessor {
 
 
     //looks in four directions and returns valid indicies
-    static getIndiciesAround(index: number, width: number, height: number, wrapping: boolean): Record<Direction,number> { 
+    static getIndiciesAround(index: number, width: number, height: number, wrapping: boolean): Object { 
 
-        var output: Record<Direction,number>;
+        var output = {};
 
         ["RIGHT","LEFT","DOWN","UP"].forEach(d => {
             var ind = ImageProcessor.getIndexInDirection(index,width,height,<Direction> d,wrapping);
