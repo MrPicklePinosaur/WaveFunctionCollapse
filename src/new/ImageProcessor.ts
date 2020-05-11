@@ -4,7 +4,7 @@
     - adjacency rules
     - frequency hints
 */
-import Direction, { getIndiciesAround, getIndexInDirection, fillArray, compareArray, findNestedArray } from "./Utils.js";
+import Direction, { getIndiciesAround, getIndexInDirection, filledArray, compareArray, findNestedArray } from "./Utils.js";
 
 export default class ImageProcessor {
 
@@ -96,8 +96,9 @@ export default class ImageProcessor {
 
     calculateFrequencyHints(): Array<number> {
         //format: index of array is tile index, array stores occurences of each tile
-        var frequency = new Array<number>(this.index_table.length);
-        fillArray(frequency,0);
+
+        var frequency = new Array<number>();
+        for (var i = 0; i < this.index_table.length; i++) { frequency.push(0); }
 
         this.indexedSprite.forEach(t => {
 

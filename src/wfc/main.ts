@@ -1,6 +1,7 @@
 
 //import ImageProcessor from "src/new/ImageProcessor.js";
 import ImageProcessor from "../new/ImageProcessor.js";
+import WaveFunction from "../new/WaveFunction.js";
 
 function drawSprite(pixels: string[], width: number, height: number, canvas: any, scale: number) {
     canvas.width = width * scale;
@@ -55,6 +56,12 @@ wfc_form.addEventListener('submit', (evt) => {
 
     //generate everything
     var ip = new ImageProcessor(pixels,inputWidth,inputHeight,sliceWidth,sliceHeight);
+    var index_table = ip.index_table;
+    var frequency = ip.calculateFrequencyHints();
+    var adjacency = ip.calculateAdjacencyRules();
+
+    var wf = new WaveFunction(10,10,index_table,frequency,adjacency);
+
 
     drawSprite(pixels,inputWidth,inputHeight,main_canvas,20);
 

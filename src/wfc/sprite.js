@@ -1,41 +1,39 @@
-"use strict";
-exports.__esModule = true;
-var Sprite = /** @class */ (function () {
-    function Sprite(width, height, pixels) {
+export default class Sprite {
+    constructor(width, height, pixels) {
         this.width = width;
         this.height = height;
         this.pixels = pixels || Sprite.emptyPixels(width, height);
     }
-    Sprite.emptyPixels = function (width, height) {
+    static emptyPixels(width, height) {
         var arr = new Array(width * height);
         for (var i = 0; i < width * height; i++) {
             arr[i] = '#000000';
         }
         return arr;
-    };
-    Sprite.prototype.getPixel = function (x, y) {
+    }
+    getPixel(x, y) {
         var self = this;
         var ind = x + y * self.width;
         if (ind < 0 || ind > self.width * self.height) {
-            console.warn("Invalid position on sprite: (" + x + "," + y + ")");
+            console.warn(`Invalid position on sprite: (${x},${y})`);
             return '#000000';
         }
         return self.pixels[ind];
-    };
-    Sprite.prototype.setPixel = function (x, y, color) {
+    }
+    setPixel(x, y, color) {
         var self = this;
         var ind = x + y * self.width;
         if (ind < 0 || ind > self.width * self.height) {
-            console.warn("Invalid position on sprite: (" + x + "," + y + ")");
+            console.warn(`Invalid position on sprite: (${x},${y})`);
             return;
         }
         self.pixels[ind] = color;
-    };
+    }
     //width and height must be positive
-    Sprite.prototype.slice = function (x, y, sliceWidth, sliceHeight) {
+    slice(x, y, sliceWidth, sliceHeight) {
         var self = this;
         if (x < 0 || x > this.width || y < 0 || y > this.height) {
-            console.warn("INVALID SLICE PARAMETERS " + x + "," + y + "," + sliceWidth + "," + sliceHeight);
+            console.warn(`INVALID SLICE PARAMETERS ${x},${y},${sliceWidth},${sliceHeight}`);
             return null;
         }
         var sliced = new Array();
@@ -56,8 +54,8 @@ var Sprite = /** @class */ (function () {
             } //wrap back around to top
         }
         return sliced;
-    };
-    Sprite.compare = function (a, b) {
+    }
+    static compare(a, b) {
         //if the sprites arent even the same size
         if (a.length != b.length) {
             return false;
@@ -68,7 +66,5 @@ var Sprite = /** @class */ (function () {
             }
         }
         return true;
-    };
-    return Sprite;
-}());
-exports["default"] = Sprite;
+    }
+}

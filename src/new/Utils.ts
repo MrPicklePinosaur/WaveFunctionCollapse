@@ -44,10 +44,13 @@ function getIndexInDirection(index: number, width: number, height: number, direc
 
 }
 
-function fillArray<T>(array: Array<T>, value: T) {
+function filledArray<T>(value: T, length: number): Array<T> {
+    var out = new Array<T>();
+    
     for (var i = 0; i < length; i++) {
-        array[i] = value;
+        out.push(value);
     }
+    return out;
 }
 
 function compareArray<T>(a: Array<T>, b: Array<T>): boolean { //comapres contents of array
@@ -70,5 +73,10 @@ function findNestedArray<T>(parent: Array<Array<T>>, target: Array<T>): number {
     return -1;
 }
 
+function logb2(x : number): number {
+    return Math.log(x) / Math.log(2);
+}
+
+
 export default Direction;
-export { getIndiciesAround, getIndexInDirection, fillArray, compareArray, findNestedArray }
+export { getIndiciesAround, getIndexInDirection, filledArray, compareArray, findNestedArray, logb2 }

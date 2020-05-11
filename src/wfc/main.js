@@ -2,6 +2,7 @@
 exports.__esModule = true;
 //import ImageProcessor from "src/new/ImageProcessor.js";
 var ImageProcessor_js_1 = require("../new/ImageProcessor.js");
+var WaveFunction_js_1 = require("../new/WaveFunction.js");
 function drawSprite(pixels, width, height, canvas, scale) {
     canvas.width = width * scale;
     canvas.height = height * scale;
@@ -47,6 +48,10 @@ wfc_form.addEventListener('submit', function (evt) {
     var sliceHeight = +data.get('slice-height');
     //generate everything
     var ip = new ImageProcessor_js_1["default"](pixels, inputWidth, inputHeight, sliceWidth, sliceHeight);
+    var index_table = ip.index_table;
+    var frequency = ip.calculateFrequencyHints();
+    var adjacency = ip.calculateAdjacencyRules();
+    var wf = new WaveFunction_js_1["default"](10, 10, index_table, frequency, adjacency);
     drawSprite(pixels, inputWidth, inputHeight, main_canvas, 20);
     //sample each point on sprite and draw it
     sliced_canvas.innerHTML = ''; //clear all child nodes
