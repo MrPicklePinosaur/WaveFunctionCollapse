@@ -33,28 +33,34 @@ var WaveFunction = /** @class */ (function () {
             //sorted insert
             this.sortedInsertIntoEntropyStack(H, i);
         }
-        this.collapseTile(0);
     }
     WaveFunction.prototype.waveFunctionCollapse = function () {
-        var lowestEntropyInd = this.entropy_stack.unshift();
+        //TODO: add some sort of check to not collapsed already collapsed tiles
+        var lowestEntropyInd = this.entropy_stack.shift().index;
         //collapse tile
+        //check to see if tile has already been collapsed
+        if (this.wavefunction[lowestEntropyInd].length <= 1) {
+            return;
+        }
         this.collapseTile(lowestEntropyInd);
     };
     WaveFunction.prototype.collapseTile = function (position) {
         var _this = this;
-        var possibleTiles = this.wavefunction[position];
         var possibilityStrip = [];
-        possibleTiles.forEach(function (t) {
+        this.wavefunction[position].forEach(function (t) {
             var freq = _this.frequency[t];
             var newStripSegment = Utils_js_1.filledArray(t, freq);
             possibilityStrip = __spreadArrays(possibilityStrip, newStripSegment);
         });
         //choose random item on possibility strip
         var choice = possibilityStrip[Math.floor(Math.random() * possibilityStrip.length)];
-        console.log(possibilityStrip);
-        console.log(choice);
+        this.wavefunction[position] = [choice];
     };
     WaveFunction.prototype.propogate = function () {
+    };
+    WaveFunction.prototype.checkEnablers = function (position) {
+        //check enablers in four directions and remove any possibilities that are invalid
+        //if a possibility becomes invalid, propogate again
     };
     //helpers
     WaveFunction.prototype.calculateEntropy = function (possibilities) {

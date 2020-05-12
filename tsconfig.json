@@ -3,5 +3,6 @@
         "target": "ESNEXT",
         "watch": true,
         "lib": ["dom","DOM.Iterable","es6","ES2015"],
+        "sourceMap": true,
     }
 }

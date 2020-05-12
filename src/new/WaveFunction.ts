@@ -42,16 +42,36 @@ export default class WaveFunction {
             this.sortedInsertIntoEntropyStack(H,i);
         }
 
-        this.collapseTile(0);
-
     }
 
     waveFunctionCollapse() {
 
-        var lowestEntropyInd = this.entropy_stack.unshift();
+        //TODO: add some sort of check to not collapsed already collapsed tiles
+
+        var lowestEntropyInd = this.entropy_stack.shift().index;
 
         //collapse tile
+
+        //check to see if tile has already been collapsed
+        if (this.wavefunction[lowestEntropyInd].length <= 1) { return; } 
+
         this.collapseTile(lowestEntropyInd);
+
+        //propogate effect
+        var callback_queue: number[] = []; //holds positions of all functions to check enablers
+
+        //prepopulate queue
+
+
+        //while callback queue is not empty
+        while (callback_queue.length > 0) {
+
+            //check enablers
+
+            //if something was invalid and removed, propogate again
+            
+        }
+
 
     }
 
@@ -70,8 +90,10 @@ export default class WaveFunction {
         this.wavefunction[position] = [choice];
     }
 
-    propogate() {
-
+    checkEnablers(position: number): boolean { //return true if nothing was invalid
+        //check enablers in four directions and remove any possibilities that are invalid
+        
+        return true;
     }
 
     //helpers
