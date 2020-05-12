@@ -72,6 +72,16 @@ function findNestedArray(parent, target) {
     return -1;
 }
 exports.findNestedArray = findNestedArray;
+//checks to see if at least one value in one array is in another
+function atLeastOneIn(array, target) {
+    array.forEach(function (v) {
+        if (target.indexOf(v) != -1) {
+            return true;
+        }
+    });
+    return false;
+}
+exports.atLeastOneIn = atLeastOneIn;
 function logb2(x) {
     return Math.log(x) / Math.log(2);
 }

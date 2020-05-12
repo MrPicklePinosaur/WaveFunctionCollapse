@@ -30,20 +30,38 @@ var WaveFunction = /** @class */ (function () {
         for (var i = 0; i < this.wavefunction.length; i++) {
             //calculate entropy and insert it sorted into entropy stack
             var H = this.calculateEntropy(this.wavefunction[i]);
-            //sorted insert
             this.sortedInsertIntoEntropyStack(H, i);
+        }
+        //main algorithm
+        while (this.entropy_stack.length > 0) {
+            this.waveFunctionCollapse();
         }
     }
     WaveFunction.prototype.waveFunctionCollapse = function () {
-        //TODO: add some sort of check to not collapsed already collapsed tiles
-        var lowestEntropyInd = this.entropy_stack.shift().index;
-        //collapse tile
+        var lowestEntropyInd = this.entropy_stack.shift().index; //find the lowest entropy tile to collapse
         //check to see if tile has already been collapsed
         if (this.wavefunction[lowestEntropyInd].length <= 1) {
             return;
         }
         this.collapseTile(lowestEntropyInd);
+        //propogate effect
+        var callback_queue = []; //holds positions of all functions to check enablers
+        //prepopulate queue
+        var indiciesAround = Utils_js_1.getIndiciesAround(lowestEntropyInd, this.outputWidth, this.outputHeight, false);
+        var surrounding = Object.keys(indiciesAround).map(function (key) { return indiciesAround[key]; }); //pull indicies out
+        callback_queue = __spreadArrays(surrounding);
+        //while callback queue is not empty
+        while (callback_queue.length > 0) {
+            var ind = callback_queue.shift();
+            //check enablers
+            if (!this.checkEnablers(ind)) { //if something was invalid and removed, propogate again
+                var indiciesAround = Utils_js_1.getIndiciesAround(ind, this.outputWidth, this.outputHeight, false);
+                var surrounding = Object.keys(indiciesAround).map(function (key) { return indiciesAround[key]; }); //pull indicies out
+                callback_queue = __spreadArrays(callback_queue, surrounding);
+            }
+        }
     };
+    //chooses one possiblitiy based on frequency hints
     WaveFunction.prototype.collapseTile = function (position) {
         var _this = this;
         var possibilityStrip = [];
@@ -56,11 +74,41 @@ var WaveFunction = /** @class */ (function () {
         var choice = possibilityStrip[Math.floor(Math.random() * possibilityStrip.length)];
         this.wavefunction[position] = [choice];
     };
-    WaveFunction.prototype.propogate = function () {
-    };
+    //check enablers in four directions and remove any possibilities that are invalid
     WaveFunction.prototype.checkEnablers = function (position) {
-        //check enablers in four directions and remove any possibilities that are invalid
-        //if a possibility becomes invalid, propogate again
+        var _this = this;
+        var indiciesAround = Utils_js_1.getIndiciesAround(position, this.outputWidth, this.outputHeight, false);
+        var toRemove = []; //all invalid tiles
+        this.wavefunction[position].forEach(function (t) {
+            var adj_data = _this.adjacency[t]; //get adjacency info on this specific tile type
+            for (var _i = 0, _a = Object.keys(adj_data); _i < _a.length; _i++) {
+                var dir = _a[_i];
+                //make sure at least one tile in each direction is possible in the wavefunction
+                var nextTilePossiblities = _this.wavefunction[indiciesAround[dir]];
+                if (!Utils_js_1.atLeastOneIn(adj_data[dir], nextTilePossiblities)) { //if invalid
+                    toRemove.push(t);
+                    break;
+                }
+            }
+        });
+        if (toRemove.length == 0) {
+            return true;
+        }
+        //remove all invalid tiles
+        for (var _i = 0, toRemove_1 = toRemove; _i < toRemove_1.length; _i++) {
+            var t = toRemove_1[_i];
+            var indToRemove = this.wavefunction[position].indexOf(t);
+            this.wavefunction[position].splice(indToRemove, 1);
+        }
+        //update tile entropy
+        var h = this.calculateEntropy(this.wavefunction[position]);
+        this.sortedInsertIntoEntropyStack(h, position);
+        //check to see if there are no items left
+        if (this.wavefunction[position].length == 0) {
+            //we hit a contradiction and have to restart
+            console.error("WAVE FUNCTION COLLAPSE FAILED");
+        }
+        return false;
     };
     //helpers
     WaveFunction.prototype.calculateEntropy = function (possibilities) {

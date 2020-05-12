@@ -37,20 +37,20 @@ export default class WaveFunction {
         for (var i = 0; i < this.wavefunction.length; i++) {
             //calculate entropy and insert it sorted into entropy stack
             var H = this.calculateEntropy(this.wavefunction[i]);
+            this.sortedInsertIntoEntropyStack(H,i);       
+        }
 
-            //sorted insert
-            this.sortedInsertIntoEntropyStack(H,i);
+        
+        //main algorithm
+        while (this.entropy_stack.length > 0) {
+            this.waveFunctionCollapse();
         }
 
     }
 
     waveFunctionCollapse() {
 
-        //TODO: add some sort of check to not collapsed already collapsed tiles
-
-        var lowestEntropyInd = this.entropy_stack.shift().index;
-
-        //collapse tile
+        var lowestEntropyInd = this.entropy_stack.shift().index; //find the lowest entropy tile to collapse
 
         //check to see if tile has already been collapsed
         if (this.wavefunction[lowestEntropyInd].length <= 1) { return; } 
@@ -69,17 +69,19 @@ export default class WaveFunction {
         while (callback_queue.length > 0) {
 
             var ind = callback_queue.shift();
+
             //check enablers
-            this.checkEnablers(ind);
-
-            //if something was invalid and removed, propogate again
-
+            if (!this.checkEnablers(ind)) { //if something was invalid and removed, propogate again
+                var indiciesAround = getIndiciesAround(ind,this.outputWidth,this.outputHeight,false);
+                var surrounding = Object.keys(indiciesAround).map(key => indiciesAround[key]); //pull indicies out
+                callback_queue = [...callback_queue, ...surrounding];
+            }
         }
-
 
     }
 
-    collapseTile(position: number) { //chooses one possiblitiy based on frequency hints
+    //chooses one possiblitiy based on frequency hints
+    collapseTile(position: number) { 
         var possibilityStrip = [];
 
         this.wavefunction[position].forEach(t => {
@@ -94,8 +96,8 @@ export default class WaveFunction {
         this.wavefunction[position] = [choice];
     }
 
+    //check enablers in four directions and remove any possibilities that are invalid
     checkEnablers(position: number): boolean { //return true if nothing was invalid
-        //check enablers in four directions and remove any possibilities that are invalid
 
         var indiciesAround = getIndiciesAround(position,this.outputWidth,this.outputHeight,false);
 
@@ -121,6 +123,16 @@ export default class WaveFunction {
         for (const t of toRemove) {
             var indToRemove = this.wavefunction[position].indexOf(t);
             this.wavefunction[position].splice(indToRemove,1);
+        }
+
+        //update tile entropy
+        var h = this.calculateEntropy(this.wavefunction[position]);
+        this.sortedInsertIntoEntropyStack(h,position);
+
+        //check to see if there are no items left
+        if (this.wavefunction[position].length == 0) {
+            //we hit a contradiction and have to restart
+            console.error("WAVE FUNCTION COLLAPSE FAILED");
         }
 
         return false;

@@ -52,7 +52,7 @@ wfc_form.addEventListener('submit', function (evt) {
     var frequency = ip.calculateFrequencyHints();
     var adjacency = ip.calculateAdjacencyRules();
     var wf = new WaveFunction_js_1["default"](10, 10, index_table, frequency, adjacency);
-    //wf.waveFunctionCollapse();
+    wf.waveFunctionCollapse();
     drawSprite(pixels, inputWidth, inputHeight, main_canvas, 20);
     //sample each point on sprite and draw it
     sliced_canvas.innerHTML = ''; //clear all child nodes
