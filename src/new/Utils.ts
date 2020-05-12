@@ -73,10 +73,18 @@ function findNestedArray<T>(parent: Array<Array<T>>, target: Array<T>): number {
     return -1;
 }
 
+//checks to see if at least one value in one array is in another
+function atLeastOneIn<T>(array: Array<T>, target: Array<T>): boolean {
+    array.forEach(v => {
+        if (target.indexOf(v) != -1) { return true; }
+    });
+    return false;
+}
+
 function logb2(x : number): number {
     return Math.log(x) / Math.log(2);
 }
 
 
 export default Direction;
-export { getIndiciesAround, getIndexInDirection, filledArray, compareArray, findNestedArray, logb2 }
+export { getIndiciesAround, getIndexInDirection, filledArray, compareArray, findNestedArray, atLeastOneIn, logb2 }

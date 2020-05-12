@@ -1,5 +1,5 @@
 
-import Direction, {logb2, filledArray} from "./Utils.js";
+import Direction, {logb2, filledArray, getIndiciesAround, atLeastOneIn} from "./Utils.js";
 
 export default class WaveFunction {
 
@@ -61,15 +61,19 @@ export default class WaveFunction {
         var callback_queue: number[] = []; //holds positions of all functions to check enablers
 
         //prepopulate queue
-
+        var indiciesAround = getIndiciesAround(lowestEntropyInd,this.outputWidth,this.outputHeight,false);
+        var surrounding = Object.keys(indiciesAround).map(key => indiciesAround[key]); //pull indicies out
+        callback_queue = [...surrounding];
 
         //while callback queue is not empty
         while (callback_queue.length > 0) {
 
+            var ind = callback_queue.shift();
             //check enablers
+            this.checkEnablers(ind);
 
             //if something was invalid and removed, propogate again
-            
+
         }
 
 
@@ -92,8 +96,35 @@ export default class WaveFunction {
 
     checkEnablers(position: number): boolean { //return true if nothing was invalid
         //check enablers in four directions and remove any possibilities that are invalid
+
+        var indiciesAround = getIndiciesAround(position,this.outputWidth,this.outputHeight,false);
+
+        var toRemove = []; //all invalid tiles
+        this.wavefunction[position].forEach(t => { //for each possible tile
+
+            var adj_data = this.adjacency[t]; //get adjacency info on this specific tile type
+            for (const dir of Object.keys(adj_data)) {
+
+                //make sure at least one tile in each direction is possible in the wavefunction
+                var nextTilePossiblities = this.wavefunction[indiciesAround[dir]];
+                if (!atLeastOneIn(adj_data[dir],nextTilePossiblities)) { //if invalid
+                    toRemove.push(t);
+                    break;
+                }
+            }
+
+        });
+
+        if (toRemove.length == 0) { return true; }
+
+        //remove all invalid tiles
+        for (const t of toRemove) {
+            var indToRemove = this.wavefunction[position].indexOf(t);
+            this.wavefunction[position].splice(indToRemove,1);
+        }
+
+        return false;
         
-        return true;
     }
 
     //helpers
