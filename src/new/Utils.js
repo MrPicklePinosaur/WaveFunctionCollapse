@@ -73,12 +73,13 @@ function findNestedArray(parent, target) {
 }
 exports.findNestedArray = findNestedArray;
 //checks to see if at least one value in one array is in another
-function atLeastOneIn(array, target) {
-    array.forEach(function (v) {
-        if (target.indexOf(v) != -1) {
+function atLeastOneIn(arr, target) {
+    for (var _i = 0, arr_1 = arr; _i < arr_1.length; _i++) {
+        var v = arr_1[_i];
+        if (target.indexOf(v) > -1) {
             return true;
         }
-    });
+    }
     return false;
 }
 exports.atLeastOneIn = atLeastOneIn;

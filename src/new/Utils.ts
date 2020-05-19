@@ -74,10 +74,10 @@ function findNestedArray<T>(parent: Array<Array<T>>, target: Array<T>): number {
 }
 
 //checks to see if at least one value in one array is in another
-function atLeastOneIn<T>(array: Array<T>, target: Array<T>): boolean {
-    array.forEach(v => {
-        if (target.indexOf(v) != -1) { return true; }
-    });
+function atLeastOneIn<T>(arr: Array<T>, target: Array<T>): boolean {
+    for (const v of arr) {
+        if (target.indexOf(v) > -1) { return true; }
+    }
     return false;
 }
 

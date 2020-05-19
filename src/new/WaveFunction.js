@@ -33,9 +33,11 @@ var WaveFunction = /** @class */ (function () {
             this.sortedInsertIntoEntropyStack(H, i);
         }
         //main algorithm
+        /*
         while (this.entropy_stack.length > 0) {
-            this.waveFunctionCollapse();
         }
+        */
+        this.waveFunctionCollapse();
     }
     WaveFunction.prototype.waveFunctionCollapse = function () {
         var lowestEntropyInd = this.entropy_stack.shift().index; //find the lowest entropy tile to collapse
@@ -78,13 +80,26 @@ var WaveFunction = /** @class */ (function () {
     WaveFunction.prototype.checkEnablers = function (position) {
         var _this = this;
         var indiciesAround = Utils_js_1.getIndiciesAround(position, this.outputWidth, this.outputHeight, false);
+        //NOTE: we can loop backwards so removing items wont have an effect
         var toRemove = []; //all invalid tiles
         this.wavefunction[position].forEach(function (t) {
             var adj_data = _this.adjacency[t]; //get adjacency info on this specific tile type
             for (var _i = 0, _a = Object.keys(adj_data); _i < _a.length; _i++) {
                 var dir = _a[_i];
+                //if direction is not valid
+                if (!indiciesAround.hasOwnProperty(dir)) {
+                    continue;
+                }
                 //make sure at least one tile in each direction is possible in the wavefunction
                 var nextTilePossiblities = _this.wavefunction[indiciesAround[dir]];
+                //console.log(`adj data ${adj_data[dir]}`);
+                //console.log(`tile possib ${nextTilePossiblities}`);
+                if (nextTilePossiblities == null) {
+                    console.log(indiciesAround);
+                    console.log(adj_data);
+                    console.log(dir);
+                    console.log(indiciesAround[dir]);
+                }
                 if (!Utils_js_1.atLeastOneIn(adj_data[dir], nextTilePossiblities)) { //if invalid
                     toRemove.push(t);
                     break;

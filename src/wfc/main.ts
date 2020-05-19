@@ -61,7 +61,7 @@ wfc_form.addEventListener('submit', (evt) => {
     var adjacency = ip.calculateAdjacencyRules();
 
     var wf = new WaveFunction(10,10,index_table,frequency,adjacency);
-    wf.waveFunctionCollapse();
+    //wf.waveFunctionCollapse();
 
     drawSprite(pixels,inputWidth,inputHeight,main_canvas,20);
 

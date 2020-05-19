@@ -42,9 +42,12 @@ export default class WaveFunction {
 
         
         //main algorithm
+        /*
         while (this.entropy_stack.length > 0) {
-            this.waveFunctionCollapse();
         }
+        */
+        this.waveFunctionCollapse();
+        
 
     }
 
@@ -101,14 +104,19 @@ export default class WaveFunction {
 
         var indiciesAround = getIndiciesAround(position,this.outputWidth,this.outputHeight,false);
 
+        //NOTE: we can loop backwards so removing items wont have an effect
         var toRemove = []; //all invalid tiles
         this.wavefunction[position].forEach(t => { //for each possible tile
 
-            var adj_data = this.adjacency[t]; //get adjacency info on this specific tile type
+            var adj_data: Record<Direction,Array<number>> = this.adjacency[t]; //get adjacency info on this specific tile type
             for (const dir of Object.keys(adj_data)) {
+
+                //if direction is not valid
+                if (!indiciesAround.hasOwnProperty(dir)) { continue; }
 
                 //make sure at least one tile in each direction is possible in the wavefunction
                 var nextTilePossiblities = this.wavefunction[indiciesAround[dir]];
+
                 if (!atLeastOneIn(adj_data[dir],nextTilePossiblities)) { //if invalid
                     toRemove.push(t);
                     break;
