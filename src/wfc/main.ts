@@ -42,6 +42,7 @@ var inputHeight = 5;
 
 const main_canvas = document.getElementById('main-canvas');
 const sliced_canvas = document.getElementById('sliced-canvas');
+const output_canvas = document.getElementById('output-canvas');
 const wfc_form = document.querySelector("form"); //only works cuz its the only form
 
 //preliminary stuff
@@ -54,14 +55,18 @@ wfc_form.addEventListener('submit', (evt) => {
     var sliceWidth: number = +(data.get('slice-width') as string); //convert to number
     var sliceHeight: number = +(data.get('slice-height') as string);
 
+    var outputWidth = 10;
+    var outputHeight = 10;
+
     //generate everything
     var ip = new ImageProcessor(pixels,inputWidth,inputHeight,sliceWidth,sliceHeight);
     var index_table = ip.index_table;
     var frequency = ip.calculateFrequencyHints();
     var adjacency = ip.calculateAdjacencyRules();
 
-    var wf = new WaveFunction(10,10,index_table,frequency,adjacency);
-    //wf.waveFunctionCollapse();
+    var wf = new WaveFunction(outputWidth,outputHeight,index_table,frequency,adjacency);
+    
+    var collapsed_sprite = wf.waveFunctionCollapse();
 
     drawSprite(pixels,inputWidth,inputHeight,main_canvas,20);
 
@@ -75,5 +80,17 @@ wfc_form.addEventListener('submit', (evt) => {
         drawSprite(ip.index_table[i],sliceWidth,sliceHeight,new_canvas,20);
         sliced_canvas.appendChild(new_canvas);
     }
-    
+
+    //OUTPUT SPRITE:
+    //now take the top left corner of each sprite and draw it
+    var output_pixels = [];
+
+    for (var tile of collapsed_sprite) {
+        var topleftpixel = index_table[tile][0];
+        output_pixels.push(topleftpixel);
+    }
+
+    drawSprite(output_pixels,outputWidth,outputHeight,output_canvas,20);
+
+
 });

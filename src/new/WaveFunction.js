@@ -32,14 +32,21 @@ var WaveFunction = /** @class */ (function () {
             var H = this.calculateEntropy(this.wavefunction[i]);
             this.sortedInsertIntoEntropyStack(H, i);
         }
-        //main algorithm
-        /*
-        while (this.entropy_stack.length > 0) {
-        }
-        */
-        this.waveFunctionCollapse();
     }
     WaveFunction.prototype.waveFunctionCollapse = function () {
+        //main algorithm
+        while (this.entropy_stack.length > 0) {
+            this.waveFunctionCollapseStep();
+        }
+        //convert 2d array into 1d and return
+        var result = [];
+        for (var _i = 0, _a = this.wavefunction; _i < _a.length; _i++) {
+            var cell = _a[_i];
+            result.push(cell[0]);
+        }
+        return result;
+    };
+    WaveFunction.prototype.waveFunctionCollapseStep = function () {
         var lowestEntropyInd = this.entropy_stack.shift().index; //find the lowest entropy tile to collapse
         //check to see if tile has already been collapsed
         if (this.wavefunction[lowestEntropyInd].length <= 1) {
@@ -92,14 +99,6 @@ var WaveFunction = /** @class */ (function () {
                 }
                 //make sure at least one tile in each direction is possible in the wavefunction
                 var nextTilePossiblities = _this.wavefunction[indiciesAround[dir]];
-                //console.log(`adj data ${adj_data[dir]}`);
-                //console.log(`tile possib ${nextTilePossiblities}`);
-                if (nextTilePossiblities == null) {
-                    console.log(indiciesAround);
-                    console.log(adj_data);
-                    console.log(dir);
-                    console.log(indiciesAround[dir]);
-                }
                 if (!Utils_js_1.atLeastOneIn(adj_data[dir], nextTilePossiblities)) { //if invalid
                     toRemove.push(t);
                     break;

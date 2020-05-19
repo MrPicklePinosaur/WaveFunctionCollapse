@@ -38,6 +38,7 @@ var inputWidth = 5;
 var inputHeight = 5;
 var main_canvas = document.getElementById('main-canvas');
 var sliced_canvas = document.getElementById('sliced-canvas');
+var output_canvas = document.getElementById('output-canvas');
 var wfc_form = document.querySelector("form"); //only works cuz its the only form
 //preliminary stuff
 wfc_form.addEventListener('submit', function (evt) {
@@ -46,13 +47,15 @@ wfc_form.addEventListener('submit', function (evt) {
     var data = new FormData(wfc_form);
     var sliceWidth = +data.get('slice-width'); //convert to number
     var sliceHeight = +data.get('slice-height');
+    var outputWidth = 10;
+    var outputHeight = 10;
     //generate everything
     var ip = new ImageProcessor_js_1["default"](pixels, inputWidth, inputHeight, sliceWidth, sliceHeight);
     var index_table = ip.index_table;
     var frequency = ip.calculateFrequencyHints();
     var adjacency = ip.calculateAdjacencyRules();
-    var wf = new WaveFunction_js_1["default"](10, 10, index_table, frequency, adjacency);
-    //wf.waveFunctionCollapse();
+    var wf = new WaveFunction_js_1["default"](outputWidth, outputHeight, index_table, frequency, adjacency);
+    var collapsed_sprite = wf.waveFunctionCollapse();
     drawSprite(pixels, inputWidth, inputHeight, main_canvas, 20);
     //sample each point on sprite and draw it
     sliced_canvas.innerHTML = ''; //clear all child nodes
@@ -62,4 +65,13 @@ wfc_form.addEventListener('submit', function (evt) {
         drawSprite(ip.index_table[i], sliceWidth, sliceHeight, new_canvas, 20);
         sliced_canvas.appendChild(new_canvas);
     }
+    //OUTPUT SPRITE:
+    //now take the top left corner of each sprite and draw it
+    var output_pixels = [];
+    for (var _i = 0, collapsed_sprite_1 = collapsed_sprite; _i < collapsed_sprite_1.length; _i++) {
+        var tile = collapsed_sprite_1[_i];
+        var topleftpixel = index_table[tile][0];
+        output_pixels.push(topleftpixel);
+    }
+    drawSprite(output_pixels, outputWidth, outputHeight, output_canvas, 20);
 });

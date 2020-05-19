@@ -40,18 +40,22 @@ export default class WaveFunction {
             this.sortedInsertIntoEntropyStack(H,i);       
         }
 
-        
-        //main algorithm
-        /*
-        while (this.entropy_stack.length > 0) {
-        }
-        */
-        this.waveFunctionCollapse();
-        
-
     }
 
     waveFunctionCollapse() {
+        //main algorithm
+        while (this.entropy_stack.length > 0) {
+            this.waveFunctionCollapseStep();
+        }
+        //convert 2d array into 1d and return
+        var result = [];
+        for (var cell of this.wavefunction) {
+            result.push(cell[0]);
+        }
+        return result;
+    }
+
+    waveFunctionCollapseStep() {
 
         var lowestEntropyInd = this.entropy_stack.shift().index; //find the lowest entropy tile to collapse
 
