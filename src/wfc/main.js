@@ -47,8 +47,8 @@ wfc_form.addEventListener('submit', function (evt) {
     var data = new FormData(wfc_form);
     var sliceWidth = +data.get('slice-width'); //convert to number
     var sliceHeight = +data.get('slice-height');
-    var outputWidth = 10;
-    var outputHeight = 10;
+    var outputWidth = 20;
+    var outputHeight = 20;
     //generate everything
     var ip = new ImageProcessor_js_1["default"](pixels, inputWidth, inputHeight, sliceWidth, sliceHeight);
     var index_table = ip.index_table;

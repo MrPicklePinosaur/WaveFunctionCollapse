@@ -55,8 +55,8 @@ wfc_form.addEventListener('submit', (evt) => {
     var sliceWidth: number = +(data.get('slice-width') as string); //convert to number
     var sliceHeight: number = +(data.get('slice-height') as string);
 
-    var outputWidth = 10;
-    var outputHeight = 10;
+    var outputWidth = 20;
+    var outputHeight = 20;
 
     //generate everything
     var ip = new ImageProcessor(pixels,inputWidth,inputHeight,sliceWidth,sliceHeight);
