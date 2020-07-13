@@ -4,7 +4,7 @@
     - adjacency rules
     - frequency hints
 */
-import Direction, { getIndiciesAround, getIndexInDirection, compareArray, findNestedArray } from "./lib/utils";
+import Direction, { getIndiciesAround, compareArray, findNestedArray } from "./lib/utils";
 
 type AdjacencyData = {
    right: number[],
@@ -72,20 +72,12 @@ export default class ImageProcessor {
             var curTile = this.indexedSprite[i];
 
             //look in every direction and compute enablers
-            var newInds = getIndiciesAround(i,this.inputWidth,this.inputHeight,true); //REPLACE THIS LATER
-
-            Object.keys(newInds).forEach(dir => {
-                
-                var newInd = newInds[dir];
-
-                //each tile is going to store it's enablers, instead of the tiles it enables
-                var newTileIndex = this.indexedSprite[newInd];
-
-                if (adjacency[curTile][<Direction>dir].indexOf(newTileIndex) == -1) {
-                    adjacency[curTile][<Direction>dir].push(newTileIndex);
-                }
-                
-            }); 
+            var newInds = getIndiciesAround(i,this.inputWidth,this.inputHeight,true); 
+            
+            if (newInds.right != undefined) { adjacency[i].right.push(newInds.right); }
+            if (newInds.left != undefined) { adjacency[i].left.push(newInds.left); }
+            if (newInds.down != undefined) { adjacency[i].down.push(newInds.down); }
+            if (newInds.up != undefined) { adjacency[i].up.push(newInds.up); }
         }
 
         return adjacency;
@@ -109,32 +101,63 @@ export default class ImageProcessor {
 
     }
 
-    //helpers
     getSubSprite(index: number, wrapping: boolean): Array<string> {
+
+        //check to see if input is valid
+        if (index < 0 || index > this.inputWidth*this.inputHeight-1 ) {
+            console.warn("slice start position out of bounds");
+        }
+        //prob not necessary
+        // if (index%this.sliceWidth+this.sliceWidth > this.inputWidth || Math.floor(index/this.sliceWidth)+this.sliceHeight > this.inputHeight) {
+        //     console.warn("slice dimensions are invalid")
+        // }
+
         var subSprite = new Array<string>();
 
-        var curIndex = index;
+        var currentIndex = index;
         for (var j = 0; j < this.sliceHeight; j++) {
-
-            var rowInd = curIndex; //save the position of the beginning of the row
-
+            
             for (var i = 0; i < this.sliceWidth; i++) {
+                subSprite.push(this.inputSprite[currentIndex]);
 
-                subSprite.push(this.inputSprite[curIndex]);
-
-                //shift to the right
-                curIndex = getIndexInDirection(curIndex,this.inputWidth,this.inputHeight,"RIGHT",wrapping);
-                if (curIndex == -1) { console.error("Invalid Subsprite"); }
-
+                currentIndex += 1;
             }
 
-            if (j < this.sliceHeight-1) { //dont go down of the final pass (bad solution for now)
-                //go down a layer
-                curIndex = getIndexInDirection(rowInd,this.inputWidth,this.inputHeight,"DOWN",wrapping);
-                if (curIndex == -1) { console.error("Invalid Subsprite"); }
-            }
+            currentIndex += (this.inputWidth-this.sliceWidth);
+
         }
 
         return subSprite;
     }
+
+
+    //NOTE: FIX THISSS!!!!!
+    //helpers
+    // getSubSprite(index: number, wrapping: boolean): Array<string> {
+    //     var subSprite = new Array<string>();
+
+    //     var curIndex = index;
+    //     for (var j = 0; j < this.sliceHeight; j++) {
+
+    //         var rowInd = curIndex; //save the position of the beginning of the row
+
+    //         for (var i = 0; i < this.sliceWidth; i++) {
+
+    //             subSprite.push(this.inputSprite[curIndex]);
+
+    //             //shift to the right
+    //             curIndex = getIndexInDirection(curIndex,this.inputWidth,this.inputHeight,"RIGHT",wrapping);
+    //             if (curIndex == -1) { console.error("Invalid Subsprite"); }
+
+    //         }
+
+    //         if (j < this.sliceHeight-1) { //dont go down of the final pass (bad solution for now)
+    //             //go down a layer
+    //             curIndex = getIndexInDirection(rowInd,this.inputWidth,this.inputHeight,"DOWN",wrapping);
+    //             if (curIndex == -1) { console.error("Invalid Subsprite"); }
+    //         }
+    //     }
+
+    //     return subSprite;
+    // }
 }

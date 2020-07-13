@@ -40,36 +40,37 @@ export default class Sprite {
         self.pixels[ind] = color;
     }
 
+    //make this a util instead
     //width and height must be positive
-    slice(x: number, y: number, sliceWidth: number, sliceHeight: number): string[] {
-        var self = this;
+    // slice(x: number, y: number, sliceWidth: number, sliceHeight: number): string[] {
+    //     var self = this;
 
-        if (x < 0 || x > this.width || y < 0 || y > this.height) {
-            console.warn(`INVALID SLICE PARAMETERS ${x},${y},${sliceWidth},${sliceHeight}`);
-            return [];
-        }
+    //     if (x < 0 || x > this.width || y < 0 || y > this.height) {
+    //         console.warn(`INVALID SLICE PARAMETERS ${x},${y},${sliceWidth},${sliceHeight}`);
+    //         return [];
+    //     }
 
-        var sliced = new Array();
+    //     var sliced = new Array();
 
-        var y_ind = y;
-        for (var j = 0; j < sliceHeight; j++) {
+    //     var y_ind = y;
+    //     for (var j = 0; j < sliceHeight; j++) {
             
-            var x_ind = x;
-            for (var i = 0; i < sliceWidth; i++) {
+    //         var x_ind = x;
+    //         for (var i = 0; i < sliceWidth; i++) {
 
-                var ind = x_ind+y_ind*self.width;
-                sliced.push(self.pixels[ind]);
+    //             var ind = x_ind+y_ind*self.width;
+    //             sliced.push(self.pixels[ind]);
 
-                x_ind += 1;
-                if (x_ind > self.width-1) { x_ind -= self.width; } //wrap back around to left
-            }
+    //             x_ind += 1;
+    //             if (x_ind > self.width-1) { x_ind -= self.width; } //wrap back around to left
+    //         }
 
-            y_ind += 1;
-            if (y_ind > self.height-1) { y_ind -= self.height; } //wrap back around to top
-        }
+    //         y_ind += 1;
+    //         if (y_ind > self.height-1) { y_ind -= self.height; } //wrap back around to top
+    //     }
 
-        return sliced;
-    }
+    //     return sliced;
+    // }
 
     //NOTE: Dont use this, instead use the compare array function from utils
     // static compare(a: string[], b: string[]): boolean { //compares the pixel data

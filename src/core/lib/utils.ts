@@ -27,7 +27,6 @@ function getIndiciesAround(index: number, width: number, height: number, wrappin
         }
 
     }
-
 }
 
 function compareArray<T>(a: Array<T>, b: Array<T>): boolean { //comapres contents of array, returns if they are the same
@@ -58,6 +57,5 @@ function atLeastOneIn<T>(arr: Array<T>, target: Array<T>): boolean {
     return false;
 }
 
-
 export default Direction;
-export { getIndiciesAround, getIndexInDirection, compareArray, findNestedArray, atLeastOneIn }
+export { getIndiciesAround, compareArray, findNestedArray, atLeastOneIn }
