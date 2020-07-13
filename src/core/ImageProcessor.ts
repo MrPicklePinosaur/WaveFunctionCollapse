@@ -120,7 +120,13 @@ export default class ImageProcessor {
             for (var i = 0; i < this.sliceWidth; i++) {
                 subSprite.push(this.inputSprite[currentIndex]);
 
-                currentIndex += 1;
+                //check to see if we should wrap back around
+                if (currentIndex%this.inputWidth+1 > this.inputWidth) {
+                    currentIndex += (1-this.inputWidth);
+                } else {
+                    currentIndex += 1;
+                }
+                
             }
 
             currentIndex += (this.inputWidth-this.sliceWidth);
